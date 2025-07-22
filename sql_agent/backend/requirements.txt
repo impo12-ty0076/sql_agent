@@ -1,0 +1,34 @@
+fastapi>=0.95.0
+uvicorn>=0.21.1
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+sqlalchemy>=2.0.0
+pyodbc>=4.0.39
+pymssql>=2.2.7
+hdbcli>=2.17.14
+openai>=1.0.0
+langchain>=0.0.267
+numpy>=1.24.3
+pandas>=2.0.0
+matplotlib>=3.7.1
+plotly>=5.14.1
+python-jose>=3.3.0
+passlib>=1.7.4
+python-multipart>=0.0.6
+faiss-cpu>=1.7.4
+tiktoken>=0.4.0
+backoff>=2.2.1
+
+# 테스트 의존성
+pytest>=7.0.0
+httpx>=0.23.0
+pytest-cov>=4.0.0
+
+# 개발 도구
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+
+# JavaScript/TypeScript 라이브러리 (프론트엔드용, 실제로는 npm으로 설치해야 함)
+# axios
+# react

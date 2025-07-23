@@ -116,6 +116,5 @@ class RagResponse(BaseModel):
     
     @validator('sources')
     def validate_sources(cls, v):
-        if not v:
-            raise ValueError("Sources cannot be empty")
+        # Allow empty sources for cases where no relevant documents are found
         return v

@@ -1,6 +1,5 @@
 from sqlalchemy import Column, String, Boolean, DateTime, Enum, ForeignKey, Table, Integer
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
 from sqlalchemy.sql import func
 import uuid
 from datetime import datetime
@@ -13,17 +12,17 @@ from ...models.user import UserRole, ThemeType
 user_roles = Table(
     'user_roles',
     BaseModel.metadata,
-    Column('user_id', UNIQUEIDENTIFIER, ForeignKey('users.id'), primary_key=True),
-    Column('role_id', UNIQUEIDENTIFIER, ForeignKey('roles.id'), primary_key=True),
+    Column('user_id', String(36), ForeignKey('users.id'), primary_key=True),
+    Column('role_id', String(36), ForeignKey('roles.id'), primary_key=True),
     Column('assigned_at', DateTime, default=datetime.utcnow),
-    Column('assigned_by', UNIQUEIDENTIFIER, ForeignKey('users.id'))
+    Column('assigned_by', String(36), ForeignKey('users.id'))
 )
 
 class User(BaseModel):
     """User database model"""
     __tablename__ = "users"
     
-    id = Column(UNIQUEIDENTIFIER, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     username = Column(String(50), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
@@ -35,6 +34,9 @@ class User(BaseModel):
     preferences = relationship("UserPreference", back_populates="user", uselist=False, cascade="all, delete-orphan")
     permissions = relationship("UserDatabasePermission", back_populates="user", cascade="all, delete-orphan")
     sessions = relationship("UserSession", back_populates="user", cascade="all, delete-orphan")
+    feedbacks = relationship("Feedback", back_populates="user", cascade="all, delete-orphan")
+    feedback_responses = relationship("FeedbackResponse", back_populates="user", cascade="all, delete-orphan")
+    created_policies = relationship("Policy", back_populates="creator", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<User {self.username}>"
@@ -43,8 +45,8 @@ class UserPreference(BaseModel):
     """User preferences database model"""
     __tablename__ = "user_preferences"
     
-    id = Column(UNIQUEIDENTIFIER, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(UNIQUEIDENTIFIER, ForeignKey("users.id"), nullable=False, unique=True)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False, unique=True)
     default_db = Column(String(100), nullable=True)
     theme = Column(String(20), default=ThemeType.LIGHT.value, nullable=False)
     results_per_page = Column(Integer, default=50, nullable=False)
@@ -59,8 +61,8 @@ class UserDatabasePermission(BaseModel):
     """User database permissions model"""
     __tablename__ = "user_database_permissions"
     
-    id = Column(UNIQUEIDENTIFIER, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(UNIQUEIDENTIFIER, ForeignKey("users.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     db_id = Column(String(100), nullable=False)
     db_type = Column(String(20), nullable=False)
     allowed_schemas = Column(String(1000), nullable=True)  # Comma-separated list
@@ -76,8 +78,8 @@ class UserSession(BaseModel):
     """User session database model"""
     __tablename__ = "user_sessions"
     
-    id = Column(UNIQUEIDENTIFIER, primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(UNIQUEIDENTIFIER, ForeignKey("users.id"), nullable=False)
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=False)
     token = Column(String(255), unique=True, nullable=False)
     expires_at = Column(DateTime, nullable=False)
     ip_address = Column(String(50), nullable=True)
@@ -95,7 +97,7 @@ class Role(BaseModel):
     """Role database model"""
     __tablename__ = "roles"
     
-    id = Column(UNIQUEIDENTIFIER, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String(50), unique=True, nullable=False)
     description = Column(String(255), nullable=True)
     

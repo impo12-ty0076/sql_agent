@@ -1,31 +1,56 @@
-from sqlalchemy import create_engine
+"""
+Database session management
+"""
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
+from contextlib import asynccontextmanager
 
 from ..core.config import settings
 
-# 데이터베이스 URL 생성
-SQLALCHEMY_DATABASE_URL = f"mssql+pymssql://{settings.DB_USER}:{settings.DB_PASSWORD}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
-
-# 엔진 생성
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    pool_pre_ping=True,  # 연결 유효성 검사
-    pool_recycle=3600,   # 1시간마다 연결 재활용
+# Create async engine
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=settings.DEBUG,
+    future=True
 )
 
-# 세션 팩토리 생성
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Create async session factory
+async_session_factory = sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autocommit=False,
+    autoflush=False
+)
 
-# Base 클래스 생성 (모델 클래스의 기본 클래스)
+# Create base class for models
 Base = declarative_base()
 
-def get_db() -> Session:
+@asynccontextmanager
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """
-    데이터베이스 세션을 제공하는 의존성 함수
+    Get database session
+    
+    Yields:
+        AsyncSession: Database session
     """
-    db = SessionLocal()
+    session = async_session_factory()
     try:
-        yield db
+        yield session
     finally:
-        db.close()
+        await session.close()
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Dependency for FastAPI to get database session
+    
+    Yields:
+        AsyncSession: Database session
+    """
+    session = async_session_factory()
+    try:
+        yield session
+    finally:
+        await session.close()

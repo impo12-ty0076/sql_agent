@@ -1,1 +1,1 @@
-# 코어 모듈 초기화
+# Core package

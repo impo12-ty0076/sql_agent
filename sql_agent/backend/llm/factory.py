@@ -78,3 +78,24 @@ class LLMServiceFactory:
         """캐시된 모든 LLM 서비스 인스턴스 제거"""
         cls._instances.clear()
         logger.info("LLM 서비스 캐시가 초기화되었습니다.")
+
+def get_llm_service(provider: str = "openai", model_name: str = "gpt-4") -> LLMService:
+    """
+    LLM 서비스 인스턴스를 가져오는 편의 함수
+    
+    Args:
+        provider (str): LLM 제공자 (기본값: "openai")
+        model_name (str): 모델 이름 (기본값: "gpt-4")
+        
+    Returns:
+        LLMService: LLM 서비스 인스턴스
+    """
+    provider_enum = LLMProvider(provider)
+    config = LLMConfig(
+        provider=provider_enum,
+        model_name=model_name,
+        api_key="",  # 실제 구현에서는 환경변수에서 가져와야 함
+        temperature=0.7,
+        max_tokens=2000
+    )
+    return LLMServiceFactory.create_service(config)

@@ -1,101 +1,128 @@
-from fastapi import Request, status
-from fastapi.responses import JSONResponse
+"""
+Middleware for request logging and error handling
+"""
+from fastapi import Request, Response, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
-from typing import Union, Dict, Any, Optional
 import logging
-import traceback
 import time
+from typing import Callable, Dict, Any
 
-# 로깅 설정
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger("middleware")
+logger = logging.getLogger(__name__)
+
+class LoggingMiddleware:
+    """Middleware for request logging"""
+    
+    async def __call__(self, request: Request, call_next: Callable) -> Response:
+        """
+        Log request and response
+        
+        Args:
+            request: FastAPI request
+            call_next: Next middleware or endpoint
+            
+        Returns:
+            Response
+        """
+        start_time = time.time()
+        
+        # Log request
+        logger.info(f"Request: {request.method} {request.url.path}")
+        
+        # Process request
+        try:
+            response = await call_next(request)
+            
+            # Log response
+            process_time = time.time() - start_time
+            logger.info(
+                f"Response: {request.method} {request.url.path} "
+                f"- Status: {response.status_code} - Time: {process_time:.4f}s"
+            )
+            
+            return response
+            
+        except Exception as e:
+            # Log error
+            process_time = time.time() - start_time
+            logger.error(
+                f"Error: {request.method} {request.url.path} "
+                f"- Error: {str(e)} - Time: {process_time:.4f}s"
+            )
+            
+            # Re-raise exception for error handler
+            raise
 
 class ErrorHandler:
-    """
-    전역 오류 처리를 위한 미들웨어 클래스
-    """
-    
-    @staticmethod
-    async def http_error_handler(request: Request, exc: Exception) -> JSONResponse:
-        """
-        HTTP 예외 처리기
-        """
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={
-                "status": "error",
-                "code": "internal_server_error",
-                "message": "내부 서버 오류가 발생했습니다.",
-                "details": str(exc),
-            }
-        )
+    """Error handlers for various exceptions"""
     
     @staticmethod
     async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
         """
-        요청 검증 오류 처리기
+        Handle validation errors
+        
+        Args:
+            request: FastAPI request
+            exc: Validation error
+            
+        Returns:
+            JSON response with error details
         """
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "status": "error",
                 "code": "validation_error",
-                "message": "요청 데이터 검증에 실패했습니다.",
-                "details": exc.errors(),
+                "message": "Validation error",
+                "details": exc.errors()
             }
         )
     
     @staticmethod
     async def db_error_handler(request: Request, exc: SQLAlchemyError) -> JSONResponse:
         """
-        데이터베이스 오류 처리기
+        Handle database errors
+        
+        Args:
+            request: FastAPI request
+            exc: Database error
+            
+        Returns:
+            JSON response with error details
         """
         logger.error(f"Database error: {str(exc)}")
+        
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "status": "error",
                 "code": "database_error",
-                "message": "데이터베이스 작업 중 오류가 발생했습니다.",
-                "details": str(exc),
+                "message": "Database error",
+                "details": str(exc)
             }
         )
-
-class LoggingMiddleware:
-    """
-    요청 로깅을 위한 미들웨어
-    """
     
-    async def __call__(self, request: Request, call_next):
-        start_time = time.time()
+    @staticmethod
+    async def http_error_handler(request: Request, exc: Exception) -> JSONResponse:
+        """
+        Handle general errors
         
-        # 요청 정보 로깅
-        logger.info(f"Request: {request.method} {request.url.path}")
+        Args:
+            request: FastAPI request
+            exc: General error
+            
+        Returns:
+            JSON response with error details
+        """
+        logger.error(f"Unhandled error: {str(exc)}")
         
-        try:
-            response = await call_next(request)
-            
-            # 응답 시간 계산 및 로깅
-            process_time = time.time() - start_time
-            logger.info(f"Response: {response.status_code} (took {process_time:.4f}s)")
-            
-            return response
-        except Exception as e:
-            # 예외 로깅
-            logger.error(f"Error processing request: {str(e)}")
-            logger.error(traceback.format_exc())
-            
-            # 예외 처리 후 응답
-            return JSONResponse(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                content={
-                    "status": "error",
-                    "code": "internal_server_error",
-                    "message": "요청 처리 중 오류가 발생했습니다.",
-                    "details": str(e),
-                }
-            )
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "status": "error",
+                "code": "internal_server_error",
+                "message": "Internal server error",
+                "details": str(exc)
+            }
+        )

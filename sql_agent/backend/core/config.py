@@ -1,35 +1,47 @@
+"""
+Application configuration
+"""
+from typing import List
+from pydantic import Field
+from pydantic_settings import BaseSettings
 import os
-from pydantic import BaseSettings
 from dotenv import load_dotenv
 
-# .env 파일 로드
+# Load environment variables from .env file
 load_dotenv()
 
 class Settings(BaseSettings):
-    # API 설정
-    API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
-    API_PORT: int = int(os.getenv("API_PORT", "8000"))
-    DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
+    """Application settings"""
     
-    # 보안 설정
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "default-secret-key")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+    # API settings
+    API_HOST: str = Field("0.0.0.0", env="API_HOST")
+    API_PORT: int = Field(8000, env="API_PORT")
     
-    # 데이터베이스 설정
-    DB_HOST: str = os.getenv("DB_HOST", "localhost")
-    DB_PORT: int = int(os.getenv("DB_PORT", "1433"))
-    DB_USER: str = os.getenv("DB_USER", "sa")
-    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "")
-    DB_NAME: str = os.getenv("DB_NAME", "sql_agent")
+    # Debug mode
+    DEBUG: bool = Field(False, env="DEBUG")
     
-    # LLM API 설정
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-    OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4")
+    # CORS settings
+    CORS_ORIGINS: str = Field("*", env="CORS_ORIGINS")
     
-    # CORS 설정
-    CORS_ORIGINS: list = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    # Database settings
+    DATABASE_URL: str = Field(
+        "sqlite+aiosqlite:///./sql_agent.db",
+        env="DATABASE_URL"
+    )
+    
+    # JWT settings
+    SECRET_KEY: str = Field("secret_key", env="SECRET_KEY")
+    JWT_ALGORITHM: str = Field("HS256", env="JWT_ALGORITHM")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(60, env="ACCESS_TOKEN_EXPIRE_MINUTES")
+    
+    # LLM settings
+    LLM_PROVIDER: str = Field("openai", env="LLM_PROVIDER")
+    OPENAI_API_KEY: str = Field("", env="OPENAI_API_KEY")
+    OPENAI_MODEL: str = Field("gpt-4", env="OPENAI_MODEL")
     
     class Config:
         env_file = ".env"
+        case_sensitive = True
 
+# Create settings instance
 settings = Settings()

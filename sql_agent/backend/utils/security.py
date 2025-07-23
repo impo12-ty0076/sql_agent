@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from jose import jwt
 from passlib.context import CryptContext
-from core.config import settings
+from ..core.config import settings
 
 # 비밀번호 해싱을 위한 컨텍스트
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -37,3 +37,11 @@ def decode_access_token(token: str) -> Dict[str, Any]:
     액세스 토큰 디코딩
     """
     return jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+
+def decrypt_password(encrypted_password: str) -> str:
+    """
+    암호화된 비밀번호 복호화 (임시 구현)
+    실제로는 적절한 암호화/복호화 로직이 필요합니다.
+    """
+    # 임시로 그대로 반환 (실제 구현에서는 복호화 로직 필요)
+    return encrypted_password

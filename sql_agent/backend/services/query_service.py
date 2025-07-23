@@ -1,7 +1,7 @@
 from typing import Dict, Any, List, Optional
 import uuid
 from datetime import datetime
-from utils.logging import log_event, log_error
+from ..utils.logging import log_event, log_error
 
 class QueryService:
     """

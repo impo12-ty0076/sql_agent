@@ -5,10 +5,10 @@ Factory for creating database connectors based on database type.
 import logging
 from typing import Dict, Type, Optional
 
-from sql_agent.backend.models.database import Database, DBType
-from sql_agent.backend.db.connectors.base import DBConnector, ConnectionPoolManager
-from sql_agent.backend.db.connectors.pool import DefaultConnectionPoolManager
-from sql_agent.backend.db.connectors.query_executor import QueryExecutionTracker
+from ...models.database import Database, DBType
+from .base import DBConnector, ConnectionPoolManager
+from .pool import DefaultConnectionPoolManager
+from .query_executor import QueryExecutionTracker
 
 logger = logging.getLogger(__name__)
 

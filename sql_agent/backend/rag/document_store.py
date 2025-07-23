@@ -8,13 +8,14 @@ from datetime import datetime
 import pickle
 
 from ..models.rag import Document, DocumentChunk, DocumentType, SearchQuery, SearchResult
+from .search_engine import SearchEngine
 
 logger = logging.getLogger(__name__)
 
 class DocumentStore:
     """
     Store for RAG documents and their embeddings.
-    Uses FAISS for efficient similarity search.
+    Uses FAISS for efficient similarity search and SearchEngine for advanced search capabilities.
     """
     
     def __init__(self, index_dir: str = "indexes"):
@@ -29,6 +30,9 @@ class DocumentStore:
         self.chunks: Dict[str, List[DocumentChunk]] = {}  # document_id -> List[DocumentChunk]
         self.db_indexes: Dict[str, faiss.Index] = {}  # db_id -> FAISS index
         self.db_doc_ids: Dict[str, List[str]] = {}  # db_id -> List[document_id]
+        
+        # Initialize the search engine
+        self.search_engine = SearchEngine()
         
         # Create index directory if it doesn't exist
         os.makedirs(index_dir, exist_ok=True)
@@ -55,6 +59,9 @@ class DocumentStore:
         if document.db_id not in self.db_doc_ids:
             self.db_doc_ids[document.db_id] = []
         self.db_doc_ids[document.db_id].append(document.id)
+        
+        # Add to search engine
+        self.search_engine.add_document(document)
         
         # Update the index for this database
         self._update_index(document.db_id)
@@ -90,6 +97,9 @@ class DocumentStore:
             if doc.db_id not in self.db_doc_ids:
                 self.db_doc_ids[doc.db_id] = []
             self.db_doc_ids[doc.db_id].append(doc.id)
+        
+        # Add all documents to search engine
+        self.search_engine.add_documents(documents)
         
         # Update indexes for each database
         for db_id in db_docs:
@@ -134,9 +144,25 @@ class DocumentStore:
         """
         return self.chunks.get(doc_id, [])
     
-    def search(self, query: SearchQuery) -> List[SearchResult]:
+    def search(self, query: SearchQuery, query_embedding: Optional[List[float]] = None, 
+               search_type: str = "hybrid") -> List[SearchResult]:
         """
-        Search for documents matching a query.
+        Search for documents matching a query using the advanced search engine.
+        
+        Args:
+            query: Search query
+            query_embedding: Pre-computed query embedding (optional)
+            search_type: Type of search ("keyword", "embedding", "hybrid", "fuzzy")
+            
+        Returns:
+            List of search results
+        """
+        # Use the search engine for advanced search capabilities
+        return self.search_engine.search(query, query_embedding, search_type)
+    
+    def keyword_search(self, query: SearchQuery) -> List[SearchResult]:
+        """
+        Perform keyword-based search.
         
         Args:
             query: Search query
@@ -144,61 +170,45 @@ class DocumentStore:
         Returns:
             List of search results
         """
-        db_id = query.db_id
+        return self.search_engine.keyword_search(query)
+    
+    def embedding_search(self, query: SearchQuery, query_embedding: List[float]) -> List[SearchResult]:
+        """
+        Perform embedding-based search.
         
-        # Check if we have an index for this database
-        if db_id not in self.db_indexes:
-            logger.warning(f"No index found for database {db_id}")
-            return []
-        
-        # Get the index and document IDs for this database
-        index = self.db_indexes[db_id]
-        doc_ids = self.db_doc_ids.get(db_id, [])
-        
-        if not doc_ids:
-            logger.warning(f"No documents found for database {db_id}")
-            return []
-        
-        # Get embedding for the query
-        # This would normally come from the LLM service, but for testing we'll use a dummy
-        # In a real implementation, you would use:
-        # query_embedding = llm_service.get_embeddings([query.query])[0]
-        # For now, we'll use a dummy embedding of the right dimension
-        dimension = index.d
-        query_embedding = np.random.rand(dimension).astype(np.float32)
-        
-        # Search the index
-        top_k = min(query.top_k, len(doc_ids))
-        distances, indices = index.search(np.array([query_embedding]), top_k)
-        
-        # Convert to search results
-        results = []
-        for i, idx in enumerate(indices[0]):
-            if idx < 0 or idx >= len(doc_ids):
-                continue
-                
-            doc_id = doc_ids[idx]
-            document = self.documents.get(doc_id)
+        Args:
+            query: Search query
+            query_embedding: Query embedding
             
-            if not document:
-                continue
-                
-            # Filter by document type if specified
-            if query.filter_doc_types and document.doc_type not in query.filter_doc_types:
-                continue
-                
-            # Convert distance to similarity score (1 - normalized distance)
-            # FAISS returns squared L2 distance, so we need to normalize it
-            distance = distances[0][i]
-            max_distance = 2.0  # Maximum possible squared L2 distance for normalized vectors
-            similarity = 1.0 - (distance / max_distance)
+        Returns:
+            List of search results
+        """
+        return self.search_engine.embedding_search(query, query_embedding)
+    
+    def hybrid_search(self, query: SearchQuery, query_embedding: Optional[List[float]] = None) -> List[SearchResult]:
+        """
+        Perform hybrid search combining keyword and embedding approaches.
+        
+        Args:
+            query: Search query
+            query_embedding: Query embedding (optional)
             
-            results.append(SearchResult(document=document, score=similarity))
+        Returns:
+            List of search results
+        """
+        return self.search_engine.hybrid_search(query, query_embedding)
+    
+    def fuzzy_search(self, query: SearchQuery) -> List[SearchResult]:
+        """
+        Perform fuzzy search to handle typos and variations.
         
-        # Sort by score in descending order
-        results.sort(key=lambda x: x.score, reverse=True)
-        
-        return results
+        Args:
+            query: Search query
+            
+        Returns:
+            List of search results
+        """
+        return self.search_engine.fuzzy_search(query)
     
     def _update_index(self, db_id: str) -> None:
         """
@@ -354,6 +364,9 @@ class DocumentStore:
         if db_id in self.db_doc_ids:
             self.db_doc_ids[db_id] = [d_id for d_id in self.db_doc_ids[db_id] if d_id != doc_id]
         
+        # Remove from search engine
+        self.search_engine.remove_document(doc_id)
+        
         # Update the index
         self._update_index(db_id)
         
@@ -384,6 +397,9 @@ class DocumentStore:
         
         # Clear db_doc_ids
         self.db_doc_ids[db_id] = []
+        
+        # Remove from search engine
+        self.search_engine.clear_database(db_id)
         
         # Remove the index
         if db_id in self.db_indexes:

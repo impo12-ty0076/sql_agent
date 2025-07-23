@@ -9,9 +9,9 @@ from contextlib import contextmanager
 import logging
 from datetime import datetime
 
-from sql_agent.backend.models.database import Database, DatabaseSchema, Schema, Table, Column
-from sql_agent.backend.models.query import QueryResult, ResultColumn
-from sql_agent.backend.db.connectors.sql_converter import SQLConverter
+from ...models.database import Database, DatabaseSchema, Schema, Table, Column
+from ...models.query import QueryResult, ResultColumn
+from .sql_converter import SQLConverter
 
 logger = logging.getLogger(__name__)
 

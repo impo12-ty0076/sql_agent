@@ -193,3 +193,7 @@ class AuthService:
     def logout(db: Session, token: str) -> bool:
         """Logout a user by invalidating their session"""
         return AuthService.invalidate_session(db, token)
+
+def get_current_user(db: Session, token: str) -> Optional[User]:
+    """Get current user from token - wrapper function for compatibility"""
+    return AuthService.get_user_from_token(db, token)

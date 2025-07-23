@@ -16,6 +16,22 @@ from .user import (
     TokenData
 )
 
+from .feedback import (
+    FeedbackCategory,
+    FeedbackStatus,
+    FeedbackPriority,
+    FeedbackBase,
+    FeedbackCreate,
+    FeedbackUpdate,
+    FeedbackResponseBase,
+    FeedbackResponseCreate,
+    FeedbackResponseUpdate,
+    FeedbackResponseRead,
+    FeedbackRead,
+    FeedbackSummary,
+    FeedbackStatistics
+)
+
 from .auth import (
     AuthMethod,
     LoginRequest,

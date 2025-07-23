@@ -1,125 +1,115 @@
-from fastapi import Request, HTTPException, status
+"""
+Authentication and permission middleware
+"""
+from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm import Session
-from typing import Optional, List, Callable, Dict, Any
+import jwt
 import logging
+from typing import Callable, Dict, Any, List
 
-from ..db.session import get_db
-from ..models.rbac import Permission, ResourceType
-from ..services.auth import AuthService
+from ..core.config import settings
 
-logger = logging.getLogger("auth_middleware")
+logger = logging.getLogger(__name__)
+
+# Public paths that don't require authentication
+PUBLIC_PATHS = [
+    "/",
+    "/api/health",
+    "/api/docs",
+    "/api/redoc",
+    "/api/openapi.json",
+    "/api/auth/login",
+    "/api/auth/register"
+]
+
+# Admin-only paths
+ADMIN_PATHS = [
+    "/api/admin/"
+]
 
 class PermissionMiddleware:
-    """
-    권한 검증을 위한 미들웨어 클래스
-    """
+    """Middleware for permission checking"""
     
-    def __init__(
-        self,
-        required_permissions: Optional[List[Permission]] = None,
-        resource_type: Optional[ResourceType] = None,
-        get_resource_id: Optional[Callable[[Request], str]] = None
-    ):
-        self.required_permissions = required_permissions or []
-        self.resource_type = resource_type
-        self.get_resource_id = get_resource_id
-    
-    async def __call__(self, request: Request, call_next):
-        # Skip permission check for authentication endpoints
-        if request.url.path.startswith("/api/auth"):
+    async def __call__(self, request: Request, call_next: Callable) -> Response:
+        """
+        Check permissions for request
+        
+        Args:
+            request: FastAPI request
+            call_next: Next middleware or endpoint
+            
+        Returns:
+            Response
+        """
+        # Skip permission check for public paths
+        path = request.url.path
+        if any(path.startswith(public_path) for public_path in PUBLIC_PATHS):
             return await call_next(request)
         
-        # Skip permission check for health check endpoint
-        if request.url.path == "/api/health":
-            return await call_next(request)
-        
-        # Get authorization header
+        # Check for authentication token
         auth_header = request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
-            return await call_next(request)
-        
-        token = auth_header.replace("Bearer ", "")
-        
-        # Get database session
-        db = next(get_db())
-        
-        # Get user from token
-        user = AuthService.get_user_from_token(db, token)
-        if not user:
-            return await call_next(request)
-        
-        # Admin users have all permissions
-        if user.role == "admin":
-            return await call_next(request)
-        
-        # If no required permissions, continue
-        if not self.required_permissions:
-            return await call_next(request)
-        
-        # TODO: Implement permission checking logic
-        # For now, just check if the user is active
-        if not user.is_active:
+            # Skip permission check for OPTIONS requests (CORS preflight)
+            if request.method == "OPTIONS":
+                return await call_next(request)
+                
             return JSONResponse(
-                status_code=status.HTTP_403_FORBIDDEN,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 content={
                     "status": "error",
-                    "code": "permission_denied",
-                    "message": "비활성화된 사용자입니다.",
-                }
+                    "code": "unauthorized",
+                    "message": "Authentication required",
+                    "details": "Missing or invalid authentication token"
+                },
+                headers={"WWW-Authenticate": "Bearer"}
             )
         
-        # Continue with the request
-        return await call_next(request)
-
-def permission_required(
-    required_permissions: List[Permission],
-    resource_type: Optional[ResourceType] = None,
-    get_resource_id: Optional[Callable[[Request], str]] = None
-):
-    """
-    특정 권한이 필요한 엔드포인트를 위한 데코레이터
-    """
-    def decorator(func):
-        async def wrapper(request: Request, *args, **kwargs):
-            # Get authorization header
-            auth_header = request.headers.get("Authorization")
-            if not auth_header or not auth_header.startswith("Bearer "):
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="인증 정보가 필요합니다.",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
-            
-            token = auth_header.replace("Bearer ", "")
-            
-            # Get database session
-            db = next(get_db())
-            
-            # Get user from token
-            user = AuthService.get_user_from_token(db, token)
-            if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="인증 정보가 유효하지 않습니다.",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
-            
-            # Admin users have all permissions
-            if user.role == "admin":
-                return await func(request, *args, **kwargs)
-            
-            # TODO: Implement permission checking logic
-            # For now, just check if the user is active
-            if not user.is_active:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail="비활성화된 사용자입니다."
-                )
-            
-            # Continue with the request
-            return await func(request, *args, **kwargs)
+        # Extract token
+        token = auth_header.split(" ")[1]
         
-        return wrapper
-    
-    return decorator
+        try:
+            # Decode token
+            payload = jwt.decode(
+                token,
+                settings.SECRET_KEY,
+                algorithms=[settings.JWT_ALGORITHM]
+            )
+            
+            # Check admin permission for admin paths
+            if any(path.startswith(admin_path) for admin_path in ADMIN_PATHS):
+                role = payload.get("role", "user")
+                if role != "admin":
+                    return JSONResponse(
+                        status_code=status.HTTP_403_FORBIDDEN,
+                        content={
+                            "status": "error",
+                            "code": "forbidden",
+                            "message": "Permission denied",
+                            "details": "Admin permission required"
+                        }
+                    )
+            
+            # Add user info to request state
+            request.state.user = {
+                "id": payload.get("sub"),
+                "username": payload.get("username", ""),
+                "email": payload.get("email", ""),
+                "role": payload.get("role", "user")
+            }
+            
+            # Continue with request
+            return await call_next(request)
+            
+        except jwt.PyJWTError as e:
+            logger.warning(f"Invalid token: {str(e)}")
+            
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={
+                    "status": "error",
+                    "code": "unauthorized",
+                    "message": "Authentication required",
+                    "details": "Invalid or expired token"
+                },
+                headers={"WWW-Authenticate": "Bearer"}
+            )

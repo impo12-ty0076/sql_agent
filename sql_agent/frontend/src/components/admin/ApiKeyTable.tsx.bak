@@ -1,0 +1,287 @@
+import React, { useState } from 'react';
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  IconButton,
+  Chip,
+  Tooltip,
+  TextField,
+  InputAdornment,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Typography,
+  SelectChangeEvent
+} from '@mui/material';
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  IconButton,
+  Chip,
+  Tooltip,
+  TextField,
+  InputAdornment,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Typography
+} from '@mui/material';
+import { Edit, Delete, Block, Search, Key } from '@mui/icons-material';
+import { ApiKey, ApiKeyFilter } from '../../types/systemSettings';
+
+interface ApiKeyTableProps {
+  apiKeys: ApiKey[];
+  loading: boolean;
+  onEdit: (apiKey: ApiKey) => void;
+  onDelete: (apiKey: ApiKey) => void;
+  onRevoke: (apiKey: ApiKey) => void;
+  onFilterChange: (filter: ApiKeyFilter) => void;
+  filter: ApiKeyFilter;
+  totalCount: number;
+  page: number;
+  rowsPerPage: number;
+  onPageChange: (event: unknown, newPage: number) => void;
+  onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const ApiKeyTable: React.FC<ApiKeyTableProps> = ({
+  apiKeys,
+  loading,
+  onEdit,
+  onDelete,
+  onRevoke,
+  onFilterChange,
+  filter,
+  totalCount,
+  page,
+  rowsPerPage,
+  onPageChange,
+  onRowsPerPageChange
+}) => {
+  const [searchTerm, setSearchTerm] = useState(filter.searchTerm || '');
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    onFilterChange({ ...filter, searchTerm });
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleSearchSubmit();
+    }
+  };
+
+  const handleServiceChange = (event: SelectChangeEvent) => {
+    onFilterChange({ ...filter, service: event.target.value as ApiKeyFilter['service'] });
+  };
+
+  const handleStatusChange = (event: SelectChangeEvent) => {
+    onFilterChange({ ...filter, status: event.target.value as ApiKeyFilter['status'] });
+  };
+
+  const getServiceColor = (service: string) => {
+    switch (service) {
+      case 'openai':
+        return 'primary';
+      case 'azure_openai':
+        return 'secondary';
+      case 'huggingface':
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active':
+        return 'success';
+      case 'expired':
+        return 'warning';
+      case 'revoked':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
+  const formatServiceName = (service: string) => {
+    switch (service) {
+      case 'openai':
+        return 'OpenAI';
+      case 'azure_openai':
+        return 'Azure OpenAI';
+      case 'huggingface':
+        return 'Hugging Face';
+      default:
+        return service.charAt(0).toUpperCase() + service.slice(1);
+    }
+  };
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ display: 'flex', mb: 2, gap: 2, flexWrap: 'wrap' }}>
+        <TextField
+          label="Search"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          onKeyPress={handleKeyPress}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={handleSearchSubmit} edge="end">
+                  <Search />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{ flexGrow: 1, minWidth: '200px' }}
+        />
+        <FormControl size="small" sx={{ minWidth: '150px' }}>
+          <InputLabel>Service</InputLabel>
+          <Select
+            value={filter.service || ''}
+            onChange={handleServiceChange}
+            label="Service"
+            displayEmpty
+          >
+            <MenuItem value="">All Services</MenuItem>
+            <MenuItem value="openai">OpenAI</MenuItem>
+            <MenuItem value="azure_openai">Azure OpenAI</MenuItem>
+            <MenuItem value="huggingface">Hugging Face</MenuItem>
+            <MenuItem value="other">Other</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: '150px' }}>
+          <InputLabel>Status</InputLabel>
+          <Select
+            value={filter.status || ''}
+            onChange={handleStatusChange}
+            label="Status"
+            displayEmpty
+          >
+            <MenuItem value="">All Status</MenuItem>
+            <MenuItem value="active">Active</MenuItem>
+            <MenuItem value="expired">Expired</MenuItem>
+            <MenuItem value="revoked">Revoked</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="API keys table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Service</TableCell>
+              <TableCell>Key</TableCell>
+              <TableCell>Created</TableCell>
+              <TableCell>Expires</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">Loading...</TableCell>
+              </TableRow>
+            ) : apiKeys.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">No API keys found</TableCell>
+              </TableRow>
+            ) : (
+              apiKeys.map((apiKey) => (
+                <TableRow key={apiKey.id} hover>
+                  <TableCell>{apiKey.name}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={formatServiceName(apiKey.service)} 
+                      color={getServiceColor(apiKey.service)}
+                      size="small"
+                      variant="outlined"
+                      icon={<Key fontSize="small" />}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                      ?¢â€¢â€¢â€??¢â€¢â€¢â€??¢â€¢â€¢â€?{apiKey.lastFourDigits}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>{new Date(apiKey.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {apiKey.expiresAt ? new Date(apiKey.expiresAt).toLocaleDateString() : 'Never'}
+                  </TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={apiKey.status} 
+                      color={getStatusColor(apiKey.status)}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Tooltip title="Edit">
+                      <IconButton 
+                        onClick={() => onEdit(apiKey)} 
+                        color="primary"
+                        disabled={apiKey.status === 'revoked'}
+                      >
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Revoke">
+                      <IconButton 
+                        onClick={() => onRevoke(apiKey)} 
+                        color="warning"
+                        disabled={apiKey.status !== 'active'}
+                      >
+                        <Block />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                      <IconButton onClick={() => onDelete(apiKey)} color="error">
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={totalCount}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={onPageChange}
+        onRowsPerPageChange={onRowsPerPageChange}
+      />
+    </Box>
+  );
+};
+
+export default ApiKeyTable;

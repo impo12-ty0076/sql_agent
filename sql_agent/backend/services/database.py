@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ..models.database import Database, DatabaseSchema, DBType, ConnectionConfig
 from ..models.database_utils import create_sample_database_schema
 from ..db.session import get_db
-from ..core.security import decrypt_password
+from ..utils.security import get_password_hash, verify_password, decrypt_password
 
 logger = logging.getLogger(__name__)
 

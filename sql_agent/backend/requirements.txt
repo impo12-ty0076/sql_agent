@@ -18,6 +18,7 @@ python-multipart>=0.0.6
 faiss-cpu>=1.7.4
 tiktoken>=0.4.0
 backoff>=2.2.1
+PyJWT
 
 # 테스트 의존성
 pytest>=7.0.0

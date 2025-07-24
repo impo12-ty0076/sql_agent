@@ -44,7 +44,7 @@ const dbSlice = createSlice({
   name: 'db',
   initialState,
   reducers: {
-    fetchDatabasesStart: (state) => {
+    fetchDatabasesStart: state => {
       state.loading = true;
       state.error = null;
     },
@@ -59,7 +59,7 @@ const dbSlice = createSlice({
     selectDatabase: (state, action: PayloadAction<Database>) => {
       state.selectedDatabase = action.payload;
     },
-    fetchTablesStart: (state) => {
+    fetchTablesStart: state => {
       state.loading = true;
       state.error = null;
     },
@@ -71,7 +71,7 @@ const dbSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    clearDbError: (state) => {
+    clearDbError: state => {
       state.error = null;
     },
   },

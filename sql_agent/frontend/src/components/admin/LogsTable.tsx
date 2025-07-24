@@ -49,8 +49,8 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
     setExpandedRow(expandedRow === logId ? null : logId);
   };
 
-  const handleFilterChange = (field: keyof LogFilter, value: any) => {
-    setLocalFilter((prev) => ({ ...prev, [field]: value }));
+  const handleFilterChange = (field: keyof LogFilter, value: unknown) => {
+    setLocalFilter(prev => ({ ...prev, [field]: value }));
   };
 
   const applyFilters = () => {
@@ -145,7 +145,7 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
                       id="log-level"
                       value={localFilter.level || ''}
                       label="Log Level"
-                      onChange={(e: SelectChangeEvent) => 
+                      onChange={(e: SelectChangeEvent) =>
                         handleFilterChange('level', e.target.value || undefined)
                       }
                     >
@@ -165,7 +165,7 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
                       id="category"
                       value={localFilter.category || ''}
                       label="Category"
-                      onChange={(e: SelectChangeEvent) => 
+                      onChange={(e: SelectChangeEvent) =>
                         handleFilterChange('category', e.target.value || undefined)
                       }
                     >
@@ -181,20 +181,26 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
                   <DatePicker
                     label="Start Date"
                     value={localFilter.startDate ? new Date(localFilter.startDate) : null}
-                    onChange={(date) => 
-                      handleFilterChange('startDate', date ? date.toISOString() : undefined)
+                    onChange={date =>
+                      handleFilterChange(
+                        'startDate',
+                        date && date instanceof Date ? date.toISOString() : undefined
+                      )
                     }
-                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                    renderInput={params => <TextField {...params} size="small" fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
                   <DatePicker
                     label="End Date"
                     value={localFilter.endDate ? new Date(localFilter.endDate) : null}
-                    onChange={(date) => 
-                      handleFilterChange('endDate', date ? date.toISOString() : undefined)
+                    onChange={date =>
+                      handleFilterChange(
+                        'endDate',
+                        date && date instanceof Date ? date.toISOString() : undefined
+                      )
                     }
-                    slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                    renderInput={params => <TextField {...params} size="small" fullWidth />}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
@@ -203,7 +209,7 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
                     size="small"
                     label="User ID"
                     value={localFilter.userId || ''}
-                    onChange={(e) => handleFilterChange('userId', e.target.value || undefined)}
+                    onChange={e => handleFilterChange('userId', e.target.value || undefined)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={3}>
@@ -212,7 +218,7 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
                     size="small"
                     label="Search Term"
                     value={localFilter.searchTerm || ''}
-                    onChange={(e) => handleFilterChange('searchTerm', e.target.value || undefined)}
+                    onChange={e => handleFilterChange('searchTerm', e.target.value || undefined)}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12} md={6}>
@@ -243,14 +249,14 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
               </TableRow>
             </TableHead>
             <TableBody>
-              {logs.length === 0 ? (
+              {!Array.isArray(logs) || logs.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} align="center">
                     No logs found
                   </TableCell>
                 </TableRow>
               ) : (
-                logs.map((log) => (
+                (Array.isArray(logs) ? logs : []).map(log => (
                   <React.Fragment key={log.id}>
                     <TableRow hover>
                       <TableCell padding="checkbox">
@@ -259,21 +265,45 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
                           size="small"
                           onClick={() => handleExpandRow(log.id)}
                         >
-                          {expandedRow === log.id ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                          {expandedRow === log.id ? (
+                            <KeyboardArrowUpIcon />
+                          ) : (
+                            <KeyboardArrowDownIcon />
+                          )}
                         </IconButton>
                       </TableCell>
                       <TableCell>{new Date(log.timestamp).toLocaleString()}</TableCell>
                       <TableCell>
                         <Chip
                           label={log.level.toUpperCase()}
-                          color={getLevelColor(log.level) as any}
+                          color={
+                            getLevelColor(log.level) as
+                              | 'default'
+                              | 'primary'
+                              | 'secondary'
+                              | 'error'
+                              | 'info'
+                              | 'success'
+                              | 'warning'
+                              | undefined
+                          }
                           size="small"
                         />
                       </TableCell>
                       <TableCell>
                         <Chip
                           label={log.category}
-                          color={getCategoryColor(log.category) as any}
+                          color={
+                            getCategoryColor(log.category) as
+                              | 'default'
+                              | 'primary'
+                              | 'secondary'
+                              | 'error'
+                              | 'info'
+                              | 'success'
+                              | 'warning'
+                              | undefined
+                          }
                           size="small"
                           variant="outlined"
                         />
@@ -288,12 +318,14 @@ const LogsTable: React.FC<LogsTableProps> = ({ logs, loading, error, filter, onF
                             <Typography variant="h6" gutterBottom component="div">
                               Details
                             </Typography>
-                            <pre style={{ 
-                              backgroundColor: '#f5f5f5', 
-                              padding: '10px', 
-                              borderRadius: '4px',
-                              overflowX: 'auto' 
-                            }}>
+                            <pre
+                              style={{
+                                backgroundColor: '#f5f5f5',
+                                padding: '10px',
+                                borderRadius: '4px',
+                                overflowX: 'auto',
+                              }}
+                            >
                               {JSON.stringify(log.details, null, 2)}
                             </pre>
                           </Box>

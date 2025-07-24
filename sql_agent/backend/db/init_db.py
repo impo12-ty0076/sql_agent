@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from datetime import datetime
 
-from .session import engine, Base, SessionLocal
+from .session import Base, SessionLocal, sync_engine
 from .models.user import User, UserPreference, UserDatabasePermission, Role
 from ..models.user import UserRole, ThemeType
 from ..core.config import settings
@@ -22,7 +22,7 @@ def init_db() -> None:
     """
     # 테이블 생성
     logger.info("Creating database tables...")
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=sync_engine)
     logger.info("Database tables created successfully")
     
     # 세션 생성
@@ -77,12 +77,23 @@ def create_admin_user(db: Session) -> None:
     admin = db.query(User).filter(User.username == "admin").first()
     
     if admin:
-        logger.info("Admin user already exists")
+        # Update password if it does not match current settings
+        from passlib.context import CryptContext
+        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        if not pwd_context.verify(settings.ADMIN_PASSWORD, admin.password_hash):
+            logger.info("Updating existing admin user's password to match settings")
+            admin.password_hash = pwd_context.hash(settings.ADMIN_PASSWORD)
+            admin.updated_at = datetime.utcnow()
+            db.commit()
+        else:
+            logger.info("Admin user already exists with up-to-date password")
         return
     
     # 관리자 계정 생성
     admin_id = str(uuid.uuid4())
-    hashed_password = pwd_context.hash("admin")  # 실제 환경에서는 강력한 비밀번호 사용
+    # Ensure password meets minimal length (6)
+    password_value = settings.ADMIN_PASSWORD if len(settings.ADMIN_PASSWORD) >= 6 else "1qazXSW@"
+    hashed_password = pwd_context.hash(password_value)
     
     admin_user = User(
         id=admin_id,

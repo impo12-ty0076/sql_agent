@@ -16,7 +16,7 @@ from ..db.crud.query import create_query, update_query, get_query_by_id
 from ..core.auth import get_current_user, get_current_user_id
 
 router = APIRouter(
-    prefix="/api/query",
+    prefix="/query",
     tags=["query"],
     responses={401: {"description": "Unauthorized"}},
 )

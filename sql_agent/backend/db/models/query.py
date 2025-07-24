@@ -27,7 +27,8 @@ class QueryDB(BaseModel):
     result_id = Column(String(36), ForeignKey("query_results.id"), nullable=True)
     
     # Relationships
-    result = relationship("QueryResultDB", back_populates="query")
+    # Commented result relationship due to mapper direction conflict for now
+    # result = relationship("QueryResultDB", back_populates="query", foreign_keys=[result_id], uselist=False)
     history = relationship("QueryHistoryDB", back_populates="query", uselist=False)
     shared_queries = relationship("SharedQueryDB", back_populates="query")
     feedbacks = relationship("Feedback", back_populates="query")
@@ -50,8 +51,9 @@ class QueryResultDB(BaseModel):
     report_id = Column(String(36), ForeignKey("reports.id"), nullable=True)
     
     # Relationships
-    query = relationship("QueryDB", back_populates="result")
-    report = relationship("ReportDB", back_populates="result", uselist=False)
+    # from .query import QueryDB  # type: ignore; for forward reference
+    # query = relationship("QueryDB", back_populates="result", foreign_keys=[query_id], uselist=False)
+    # report = relationship("ReportDB", back_populates="result", uselist=False)
     
     def __repr__(self):
         return f"<QueryResult {self.id} - {self.row_count} rows>"
@@ -67,7 +69,7 @@ class ReportDB(BaseModel):
     insights = Column(JSON, nullable=False)        # List of insight strings
     
     # Relationships
-    result = relationship("QueryResultDB", back_populates="report")
+    # result = relationship("QueryResultDB", back_populates="report")
     
     def __repr__(self):
         return f"<Report {self.id}>"

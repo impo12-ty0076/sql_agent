@@ -30,7 +30,7 @@ export interface AuthState {
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
-  token: null,
+  token: typeof window !== 'undefined' ? localStorage.getItem('token') : null, // localStorage에서 토큰 복원
   loading: false,
   error: null,
 };
@@ -39,7 +39,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginStart: (state) => {
+    loginStart: state => {
       state.loading = true;
       state.error = null;
     },
@@ -54,12 +54,12 @@ const authSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    logout: (state) => {
+    logout: state => {
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
     },
-    clearError: (state) => {
+    clearError: state => {
       state.error = null;
     },
   },

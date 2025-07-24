@@ -12,7 +12,7 @@ jest.mock('../../components/history/SharedQueryView', () => {
       <div data-testid="shared-query-view">
         Shared Query View (ID: {shareId}, Token: {token})
       </div>
-    )
+    ),
   };
 });
 
@@ -20,16 +20,16 @@ const mockStore = configureStore();
 
 describe('SharedQuery', () => {
   let store: any;
-  
+
   beforeEach(() => {
     store = mockStore({
       auth: {
         isAuthenticated: false,
-        user: null
-      }
+        user: null,
+      },
     });
   });
-  
+
   it('renders error message when id or token is missing', () => {
     render(
       <Provider store={store}>
@@ -40,11 +40,11 @@ describe('SharedQuery', () => {
         </MemoryRouter>
       </Provider>
     );
-    
+
     expect(screen.getByText('잘못된 공유 링크')).toBeInTheDocument();
     expect(screen.getByText('유효한 공유 ID와 토큰이 필요합니다.')).toBeInTheDocument();
   });
-  
+
   it('renders SharedQueryView with correct props when id and token are provided', () => {
     render(
       <Provider store={store}>
@@ -55,7 +55,7 @@ describe('SharedQuery', () => {
         </MemoryRouter>
       </Provider>
     );
-    
+
     expect(screen.getByTestId('shared-query-view')).toBeInTheDocument();
     expect(screen.getByText('Shared Query View (ID: 123, Token: abc)')).toBeInTheDocument();
   });

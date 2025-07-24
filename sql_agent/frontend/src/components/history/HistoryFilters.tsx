@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  Box, 
-  Paper, 
-  TextField, 
-  FormControlLabel, 
-  Checkbox, 
-  Button, 
+import {
+  Box,
+  Paper,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Button,
   Chip,
   Autocomplete,
   IconButton,
@@ -15,7 +15,7 @@ import {
   Grid,
   Collapse,
   Tooltip,
-  Badge
+  Badge,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -35,26 +35,38 @@ import api from '../../services/api';
 const HistoryFilters: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { filters } = useSelector((state: RootState) => state.history);
-  
+
   const [expanded, setExpanded] = useState<boolean>(false);
-  const [startDate, setStartDate] = useState<Date | null>(filters.start_date ? new Date(filters.start_date) : null);
-  const [endDate, setEndDate] = useState<Date | null>(filters.end_date ? new Date(filters.end_date) : null);
+  const [startDate, setStartDate] = useState<Date | null>(
+    filters.start_date ? new Date(filters.start_date) : null
+  );
+  const [endDate, setEndDate] = useState<Date | null>(
+    filters.end_date ? new Date(filters.end_date) : null
+  );
   const [favoriteOnly, setFavoriteOnly] = useState<boolean>(filters.favorite_only || false);
   const [selectedTags, setSelectedTags] = useState<string[]>(filters.tags || []);
   const [searchText, setSearchText] = useState<string>(filters.search_text || '');
   const [availableTags, setAvailableTags] = useState<string[]>([
-    '중요', '보고서', '매출', '고객', '제품', '분석', '월간', '분기', '연간'
+    '중요',
+    '보고서',
+    '매출',
+    '고객',
+    '제품',
+    '분석',
+    '월간',
+    '분기',
+    '연간',
   ]);
-  
+
   // Count active filters
   const activeFilterCount = [
     startDate !== null,
     endDate !== null,
     favoriteOnly,
     selectedTags.length > 0,
-    searchText.trim() !== ''
+    searchText.trim() !== '',
   ].filter(Boolean).length;
-  
+
   useEffect(() => {
     // Fetch available tags from API
     const fetchTags = async () => {
@@ -67,20 +79,22 @@ const HistoryFilters: React.FC = () => {
         console.error('Failed to fetch tags:', err);
       }
     };
-    
+
     fetchTags();
   }, []);
-  
+
   const handleApplyFilters = () => {
-    dispatch(setFilters({
-      favorite_only: favoriteOnly,
-      tags: selectedTags,
-      start_date: startDate ? format(startDate, 'yyyy-MM-dd') : undefined,
-      end_date: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
-      search_text: searchText.trim() || undefined,
-    }));
+    dispatch(
+      setFilters({
+        favorite_only: favoriteOnly,
+        tags: selectedTags,
+        start_date: startDate ? format(startDate, 'yyyy-MM-dd') : undefined,
+        end_date: endDate ? format(endDate, 'yyyy-MM-dd') : undefined,
+        search_text: searchText.trim() || undefined,
+      })
+    );
   };
-  
+
   const handleResetFilters = () => {
     setStartDate(null);
     setEndDate(null);
@@ -89,7 +103,7 @@ const HistoryFilters: React.FC = () => {
     setSearchText('');
     dispatch(resetFilters());
   };
-  
+
   const toggleExpanded = () => {
     setExpanded(!expanded);
   };
@@ -105,12 +119,12 @@ const HistoryFilters: React.FC = () => {
           </Tooltip>
           <Typography variant="h6">필터</Typography>
         </Box>
-        
+
         <IconButton onClick={toggleExpanded}>
           {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
         </IconButton>
       </Box>
-      
+
       {/* 검색 필드는 항상 표시 */}
       <Box sx={{ mb: 2 }}>
         <TextField
@@ -119,7 +133,7 @@ const HistoryFilters: React.FC = () => {
           label="검색"
           placeholder="쿼리 내용, 메모 검색"
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={e => setSearchText(e.target.value)}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -128,19 +142,15 @@ const HistoryFilters: React.FC = () => {
             ),
             endAdornment: searchText && (
               <InputAdornment position="end">
-                <IconButton
-                  size="small"
-                  onClick={() => setSearchText('')}
-                  edge="end"
-                >
+                <IconButton size="small" onClick={() => setSearchText('')} edge="end">
                   <ClearIcon fontSize="small" />
                 </IconButton>
               </InputAdornment>
-            )
+            ),
           }}
         />
       </Box>
-      
+
       <Collapse in={expanded}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
@@ -149,67 +159,63 @@ const HistoryFilters: React.FC = () => {
                 <DatePicker
                   label="시작일"
                   value={startDate}
-                  onChange={(newValue) => setStartDate(newValue)}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      size: "small",
-                      InputProps: {
-                        endAdornment: startDate && (
+                  onChange={newValue => setStartDate(newValue as Date | null)}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      size="small"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: startDate ? (
                           <InputAdornment position="end">
-                            <IconButton
-                              size="small"
-                              onClick={() => setStartDate(null)}
-                              edge="end"
-                            >
+                            <IconButton size="small" onClick={() => setStartDate(null)} edge="end">
                               <ClearIcon fontSize="small" />
                             </IconButton>
                           </InputAdornment>
-                        )
-                      }
-                    }
-                  }}
+                        ) : params.InputProps?.endAdornment,
+                      }}
+                    />
+                  )}
                 />
                 <DatePicker
                   label="종료일"
                   value={endDate}
-                  onChange={(newValue) => setEndDate(newValue)}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      size: "small",
-                      InputProps: {
-                        endAdornment: endDate && (
+                  onChange={newValue => setEndDate(newValue as Date | null)}
+                  renderInput={params => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      size="small"
+                      InputProps={{
+                        ...params.InputProps,
+                        endAdornment: endDate ? (
                           <InputAdornment position="end">
-                            <IconButton
-                              size="small"
-                              onClick={() => setEndDate(null)}
-                              edge="end"
-                            >
+                            <IconButton size="small" onClick={() => setEndDate(null)} edge="end">
                               <ClearIcon fontSize="small" />
                             </IconButton>
                           </InputAdornment>
-                        )
-                      }
-                    }
-                  }}
+                        ) : params.InputProps?.endAdornment,
+                      }}
+                    />
+                  )}
                 />
               </Box>
             </LocalizationProvider>
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <FormControlLabel
                 control={
-                  <Checkbox 
-                    checked={favoriteOnly} 
-                    onChange={(e) => setFavoriteOnly(e.target.checked)}
+                  <Checkbox
+                    checked={favoriteOnly}
+                    onChange={e => setFavoriteOnly(e.target.checked)}
                   />
                 }
                 label="즐겨찾기만 보기"
               />
-              
+
               <Autocomplete
                 multiple
                 id="tags-filter"
@@ -218,14 +224,10 @@ const HistoryFilters: React.FC = () => {
                 onChange={(_, newValue) => setSelectedTags(newValue)}
                 renderTags={(value, getTagProps) =>
                   value.map((option, index) => (
-                    <Chip
-                      label={option}
-                      {...getTagProps({ index })}
-                      key={option}
-                    />
+                    <Chip label={option} {...getTagProps({ index })} key={option} />
                   ))
                 }
-                renderInput={(params) => (
+                renderInput={params => (
                   <TextField
                     {...params}
                     variant="outlined"
@@ -242,19 +244,12 @@ const HistoryFilters: React.FC = () => {
           </Grid>
         </Grid>
       </Collapse>
-      
+
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, gap: 1 }}>
-        <Button 
-          variant="outlined" 
-          onClick={handleResetFilters}
-          disabled={activeFilterCount === 0}
-        >
+        <Button variant="outlined" onClick={handleResetFilters} disabled={activeFilterCount === 0}>
           초기화
         </Button>
-        <Button 
-          variant="contained" 
-          onClick={handleApplyFilters}
-        >
+        <Button variant="contained" onClick={handleApplyFilters}>
           적용
         </Button>
       </Box>

@@ -52,17 +52,17 @@ const UserTable: React.FC<UserTableProps> = ({ users, loading, filter, onFilterC
 
   const handleRoleFilterChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
-    onFilterChange({ 
-      ...filter, 
-      role: value === 'all' ? undefined : value as 'user' | 'admin' 
+    onFilterChange({
+      ...filter,
+      role: value === 'all' ? undefined : (value as 'user' | 'admin'),
     });
   };
 
   const handleStatusFilterChange = (event: SelectChangeEvent<string>) => {
     const value = event.target.value;
-    onFilterChange({ 
-      ...filter, 
-      status: value === 'all' ? undefined : value as 'active' | 'inactive' | 'suspended' 
+    onFilterChange({
+      ...filter,
+      status: value === 'all' ? undefined : (value as 'active' | 'inactive' | 'suspended'),
     });
   };
 
@@ -107,11 +107,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, loading, filter, onFilterC
         />
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Role</InputLabel>
-          <Select
-            value={filter.role || 'all'}
-            label="Role"
-            onChange={handleRoleFilterChange}
-          >
+          <Select value={filter.role || 'all'} label="Role" onChange={handleRoleFilterChange}>
             <MenuItem value="all">All Roles</MenuItem>
             <MenuItem value="user">User</MenuItem>
             <MenuItem value="admin">Admin</MenuItem>
@@ -119,11 +115,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, loading, filter, onFilterC
         </FormControl>
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Status</InputLabel>
-          <Select
-            value={filter.status || 'all'}
-            label="Status"
-            onChange={handleStatusFilterChange}
-          >
+          <Select value={filter.status || 'all'} label="Status" onChange={handleStatusFilterChange}>
             <MenuItem value="all">All Status</MenuItem>
             <MenuItem value="active">Active</MenuItem>
             <MenuItem value="inactive">Inactive</MenuItem>
@@ -158,41 +150,30 @@ const UserTable: React.FC<UserTableProps> = ({ users, loading, filter, onFilterC
                 </TableCell>
               </TableRow>
             ) : (
-              users
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((user) => (
-                  <TableRow key={user.id} hover>
-                    <TableCell>{user.username}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={user.role} 
-                        color={getRoleColor(user.role) as any} 
-                        size="small" 
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={user.status} 
-                        color={getStatusColor(user.status) as any} 
-                        size="small" 
-                      />
-                    </TableCell>
-                    <TableCell>
-                      {new Date(user.lastLogin).toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title="Edit User">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditUser(user.id)}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
+              users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(user => (
+                <TableRow key={user.id} hover>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    <Chip label={user.role} color={getRoleColor(user.role) as any} size="small" />
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={user.status}
+                      color={getStatusColor(user.status) as any}
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>{new Date(user.lastLogin).toLocaleString()}</TableCell>
+                  <TableCell>
+                    <Tooltip title="Edit User">
+                      <IconButton size="small" onClick={() => handleEditUser(user.id)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>

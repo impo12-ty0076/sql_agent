@@ -53,10 +53,13 @@ const reportSlice = createSlice({
     toggleReportGeneration: (state, action: PayloadAction<boolean>) => {
       state.reportGenerationEnabled = action.payload;
     },
-    updateReportOptions: (state, action: PayloadAction<{
-      visualizationTypes?: string[];
-      includeInsights?: boolean;
-    }>) => {
+    updateReportOptions: (
+      state,
+      action: PayloadAction<{
+        visualizationTypes?: string[];
+        includeInsights?: boolean;
+      }>
+    ) => {
       if (action.payload.visualizationTypes !== undefined) {
         state.reportGenerationOptions.visualizationTypes = action.payload.visualizationTypes;
       }
@@ -64,16 +67,19 @@ const reportSlice = createSlice({
         state.reportGenerationOptions.includeInsights = action.payload.includeInsights;
       }
     },
-    startReportGeneration: (state) => {
+    startReportGeneration: state => {
       state.reportGenerationStatus.isGenerating = true;
       state.reportGenerationStatus.progress = 0;
       state.reportGenerationStatus.statusMessage = '리포트 생성 준비 중...';
       state.error = null;
     },
-    updateReportProgress: (state, action: PayloadAction<{
-      progress: number;
-      statusMessage: string;
-    }>) => {
+    updateReportProgress: (
+      state,
+      action: PayloadAction<{
+        progress: number;
+        statusMessage: string;
+      }>
+    ) => {
       state.reportGenerationStatus.progress = action.payload.progress;
       state.reportGenerationStatus.statusMessage = action.payload.statusMessage;
     },
@@ -87,7 +93,7 @@ const reportSlice = createSlice({
       state.reportGenerationStatus.isGenerating = false;
       state.error = action.payload;
     },
-    clearReport: (state) => {
+    clearReport: state => {
       state.currentReport = null;
       state.reportGenerationStatus.progress = 0;
       state.reportGenerationStatus.statusMessage = '';

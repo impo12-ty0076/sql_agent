@@ -11,7 +11,7 @@ jest.mock('@mui/x-date-pickers/DatePicker', () => ({
     <input
       type="text"
       placeholder={label}
-      onChange={(e) => onChange(new Date(e.target.value))}
+      onChange={e => onChange(new Date(e.target.value))}
       data-testid={`mock-date-picker-${label.replace(/\s+/g, '-').toLowerCase()}`}
     />
   ),
@@ -52,7 +52,7 @@ describe('LogsTable', () => {
         onFilterChange={mockOnFilterChange}
       />
     );
-    
+
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
@@ -66,7 +66,7 @@ describe('LogsTable', () => {
         onFilterChange={mockOnFilterChange}
       />
     );
-    
+
     expect(screen.getByText('Test error')).toBeInTheDocument();
   });
 
@@ -80,7 +80,7 @@ describe('LogsTable', () => {
         onFilterChange={mockOnFilterChange}
       />
     );
-    
+
     expect(screen.getByText('No logs found')).toBeInTheDocument();
   });
 
@@ -96,14 +96,14 @@ describe('LogsTable', () => {
         />
       </LocalizationProvider>
     );
-    
+
     // Check table headers
     expect(screen.getByText('Timestamp')).toBeInTheDocument();
     expect(screen.getByText('Level')).toBeInTheDocument();
     expect(screen.getByText('Category')).toBeInTheDocument();
     expect(screen.getByText('Message')).toBeInTheDocument();
     expect(screen.getByText('User ID')).toBeInTheDocument();
-    
+
     // Check log entries
     expect(screen.getByText('User logged in')).toBeInTheDocument();
     expect(screen.getByText('Query execution failed')).toBeInTheDocument();
@@ -127,21 +127,21 @@ describe('LogsTable', () => {
         />
       </LocalizationProvider>
     );
-    
+
     // Initially filters should be hidden
     expect(screen.getByText('Show Filters')).toBeInTheDocument();
-    
+
     // Click to show filters
     fireEvent.click(screen.getByText('Show Filters'));
-    
+
     // Now filters should be visible and button text changed
     expect(screen.getByText('Hide Filters')).toBeInTheDocument();
     expect(screen.getByText('Log Level')).toBeInTheDocument();
     expect(screen.getByText('Category')).toBeInTheDocument();
-    
+
     // Click to hide filters
     fireEvent.click(screen.getByText('Hide Filters'));
-    
+
     // Filters should be hidden again
     expect(screen.getByText('Show Filters')).toBeInTheDocument();
   });
@@ -158,14 +158,14 @@ describe('LogsTable', () => {
         />
       </LocalizationProvider>
     );
-    
+
     // Initially details should be hidden
     expect(screen.queryByText('Details')).not.toBeInTheDocument();
-    
+
     // Click to expand first log
     const expandButtons = screen.getAllByRole('button', { name: 'expand row' });
     fireEvent.click(expandButtons[0]);
-    
+
     // Now details should be visible
     expect(screen.getByText('Details')).toBeInTheDocument();
     expect(screen.getByText(/"ip": "192.168.1.1"/)).toBeInTheDocument();

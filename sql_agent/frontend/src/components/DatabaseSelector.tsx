@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  FormControl, 
-  InputLabel, 
-  Select, 
-  MenuItem, 
-  Button, 
-  Typography, 
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  Typography,
   CircularProgress,
   SelectChangeEvent,
   Alert,
-  Snackbar
+  Snackbar,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
@@ -19,7 +19,9 @@ import { dbService } from '../services/dbService';
 
 const DatabaseSelector: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { databases, selectedDatabase, loading, error } = useSelector((state: RootState) => state.db);
+  const { databases, selectedDatabase, loading, error } = useSelector(
+    (state: RootState) => state.db
+  );
   const [selectedDbId, setSelectedDbId] = useState<string>('');
   const [connecting, setConnecting] = useState<boolean>(false);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -53,8 +55,9 @@ const DatabaseSelector: React.FC = () => {
       setSnackbarMessage('데이터베이스에 성공적으로 연결되었습니다.');
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
-    } catch (error: any) {
-      setSnackbarMessage(error.message || '데이터베이스 연결에 실패했습니다.');
+    } catch (error) {
+      const errMsg = (error as { message?: string }).message || '데이터베이스 연결에 실패했습니다.';
+      setSnackbarMessage(errMsg);
       setSnackbarSeverity('error');
       setOpenSnackbar(true);
     } finally {
@@ -76,20 +79,20 @@ const DatabaseSelector: React.FC = () => {
       <Typography variant="h6" gutterBottom>
         데이터베이스 선택
       </Typography>
-      
+
       {loading && !connecting && (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <CircularProgress size={24} sx={{ mr: 2 }} />
           <Typography>데이터베이스 목록을 불러오는 중...</Typography>
         </Box>
       )}
-      
+
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
-      
+
       <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 2 }}>
         <FormControl fullWidth>
           <InputLabel id="database-select-label">데이터베이스</InputLabel>
@@ -101,9 +104,9 @@ const DatabaseSelector: React.FC = () => {
             onChange={handleDatabaseChange}
             disabled={loading || connecting}
           >
-            {databases.map((db) => (
-              <MenuItem 
-                key={db.id} 
+            {databases.map(db => (
+              <MenuItem
+                key={db.id}
                 value={db.id}
                 onClick={() => db.connected && handleSelectExisting(db)}
               >
@@ -112,21 +115,22 @@ const DatabaseSelector: React.FC = () => {
             ))}
           </Select>
         </FormControl>
-        
-        <Button 
-          variant="contained" 
+
+        <Button
+          variant="contained"
           onClick={handleConnect}
-          disabled={!selectedDbId || loading || connecting || (selectedDatabase?.id === selectedDbId && selectedDatabase?.connected)}
+          disabled={
+            !selectedDbId ||
+            loading ||
+            connecting ||
+            (selectedDatabase?.id === selectedDbId && selectedDatabase?.connected)
+          }
         >
           {connecting ? <CircularProgress size={24} /> : '연결'}
         </Button>
       </Box>
-      
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-      >
+
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>

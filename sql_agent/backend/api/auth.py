@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 
-from ..db.session import get_db
+from ..core.dependencies import get_sync_db
 from ..models.auth import LoginRequest, LoginResponse
 from ..models.user import UserResponse
 from ..services.auth import AuthService
@@ -21,7 +21,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 async def login(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ) -> LoginResponse:
     """
     사용자 로그인 및 액세스 토큰 발급
@@ -58,7 +58,7 @@ async def login(
 @router.post("/logout")
 async def logout(
     token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ) -> Dict[str, Any]:
     """
     사용자 로그아웃

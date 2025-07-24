@@ -9,10 +9,10 @@ import { ThunkDispatch } from '@reduxjs/toolkit';
  */
 export const createMockStore = (initialState: any) => {
   const actions: AnyAction[] = [];
-  
+
   const store = configureStore({
     reducer: () => initialState,
-    middleware: (getDefaultMiddleware) => 
+    middleware: getDefaultMiddleware =>
       getDefaultMiddleware({
         thunk: {
           extraArgument: {},

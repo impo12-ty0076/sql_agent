@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from './store';
+import { RootState, AppDispatch } from './store';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import UserProfile from './pages/UserProfile';
@@ -52,12 +52,12 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { theme: themeMode } = useSelector((state: RootState) => state.ui);
 
   // Check authentication status on app load
   useEffect(() => {
-    dispatch(authService.checkAuth() as any);
+    dispatch(authService.checkAuth());
   }, [dispatch]);
 
   // Create theme based on the theme mode from Redux store

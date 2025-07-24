@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 
 from .config import settings
-from ..db.session import get_db
+from ..db.session import get_db, SessionLocal
 from ..db.models.user import User
 from ..models.user import UserResponse
 from ..models.rbac import Permission
@@ -13,9 +13,18 @@ from ..services.auth import AuthService
 # OAuth2 설정
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
+# Synchronous DB dependency for services that require sync SQLAlchemy Session
+def get_sync_db():
+    """Yield a synchronous database session (SessionLocal)"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ) -> User:
     """
     JWT 토큰에서 현재 사용자 정보를 추출하는 의존성 함수
@@ -94,7 +103,7 @@ def check_permission(required_permissions: List[Permission]):
     def permission_checker(
         current_user: UserResponse = Depends(get_current_active_user),
         request: Request = None,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_sync_db)
     ) -> UserResponse:
         # Admin users have all permissions
         if current_user.role == "admin":

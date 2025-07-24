@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str = Field("openai", env="LLM_PROVIDER")
     OPENAI_API_KEY: str = Field("", env="OPENAI_API_KEY")
     OPENAI_MODEL: str = Field("gpt-4", env="OPENAI_MODEL")
+
+    # Admin password (for initial admin user creation)
+    ADMIN_PASSWORD: str = Field("1qazXSW@", env="ADMIN_PASSWORD")
     
     class Config:
         env_file = ".env"

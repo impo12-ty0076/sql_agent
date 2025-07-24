@@ -18,36 +18,36 @@ describe('SystemStatusCard', () => {
 
   test('renders loading state', () => {
     render(<SystemStatusCard status={null} loading={true} error={null} />);
-    
+
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   test('renders error state', () => {
     render(<SystemStatusCard status={null} loading={false} error="Test error" />);
-    
+
     expect(screen.getByText('Test error')).toBeInTheDocument();
   });
 
   test('renders empty state', () => {
     render(<SystemStatusCard status={null} loading={false} error={null} />);
-    
+
     expect(screen.getByText('No status data available')).toBeInTheDocument();
   });
 
   test('renders system status correctly', () => {
     render(<SystemStatusCard status={mockStatus} loading={false} error={null} />);
-    
+
     // Check title and status
     expect(screen.getByText('System Status')).toBeInTheDocument();
     expect(screen.getByText('HEALTHY')).toBeInTheDocument();
-    
+
     // Check uptime
     expect(screen.getByText('Uptime')).toBeInTheDocument();
     expect(screen.getByText('1d 0h 0m')).toBeInTheDocument();
-    
+
     // Check last checked
     expect(screen.getByText('Last Checked')).toBeInTheDocument();
-    
+
     // Check component statuses
     expect(screen.getByText('Component Status')).toBeInTheDocument();
     expect(screen.getByText('Database')).toBeInTheDocument();
@@ -61,9 +61,9 @@ describe('SystemStatusCard', () => {
       ...mockStatus,
       status: 'degraded',
     };
-    
+
     render(<SystemStatusCard status={degradedStatus} loading={false} error={null} />);
-    
+
     expect(screen.getByText('DEGRADED')).toBeInTheDocument();
   });
 });

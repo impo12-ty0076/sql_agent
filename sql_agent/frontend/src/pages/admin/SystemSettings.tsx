@@ -13,7 +13,7 @@ import {
   Snackbar,
   Alert,
   Paper,
-  Divider
+  Divider,
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import ConnectionConfigTable from '../../components/admin/ConnectionConfigTable';
@@ -24,14 +24,14 @@ import BackupConfigTable from '../../components/admin/BackupConfigTable';
 import BackupConfigForm from '../../components/admin/BackupConfigForm';
 import BackupRecordsTable from '../../components/admin/BackupRecordsTable';
 import { systemSettingsService } from '../../services/systemSettingsService';
-import { 
-  ConnectionConfig, 
-  ApiKey, 
-  BackupConfig, 
+import {
+  ConnectionConfig,
+  ApiKey,
+  BackupConfig,
   BackupRecord,
   ConnectionConfigFilter,
   ApiKeyFilter,
-  BackupFilter
+  BackupFilter,
 } from '../../types/systemSettings';
 
 interface TabPanelProps {
@@ -51,11 +51,7 @@ const TabPanel = (props: TabPanelProps) => {
       aria-labelledby={`settings-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 };
@@ -69,7 +65,7 @@ const a11yProps = (index: number) => {
 
 const SystemSettings: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
-  
+
   // Connection configs state
   const [connections, setConnections] = useState<ConnectionConfig[]>([]);
   const [connectionFilter, setConnectionFilter] = useState<ConnectionConfigFilter>({});
@@ -79,7 +75,7 @@ const SystemSettings: React.FC = () => {
   const [selectedConnection, setSelectedConnection] = useState<ConnectionConfig | null>(null);
   const [showConnectionForm, setShowConnectionForm] = useState(false);
   const [deleteConnectionDialog, setDeleteConnectionDialog] = useState(false);
-  
+
   // API keys state
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [apiKeyFilter, setApiKeyFilter] = useState<ApiKeyFilter>({});
@@ -90,13 +86,13 @@ const SystemSettings: React.FC = () => {
   const [showApiKeyForm, setShowApiKeyForm] = useState(false);
   const [deleteApiKeyDialog, setDeleteApiKeyDialog] = useState(false);
   const [revokeApiKeyDialog, setRevokeApiKeyDialog] = useState(false);
-  
+
   // Backup configs state
   const [backupConfigs, setBackupConfigs] = useState<BackupConfig[]>([]);
   const [selectedBackupConfig, setSelectedBackupConfig] = useState<BackupConfig | null>(null);
   const [showBackupConfigForm, setShowBackupConfigForm] = useState(false);
   const [deleteBackupConfigDialog, setDeleteBackupConfigDialog] = useState(false);
-  
+
   // Backup records state
   const [backupRecords, setBackupRecords] = useState<BackupRecord[]>([]);
   const [backupFilter, setBackupFilter] = useState<BackupFilter>({});
@@ -105,7 +101,7 @@ const SystemSettings: React.FC = () => {
   const [backupTotalCount, setBackupTotalCount] = useState(0);
   const [selectedBackupRecord, setSelectedBackupRecord] = useState<BackupRecord | null>(null);
   const [restoreBackupDialog, setRestoreBackupDialog] = useState(false);
-  
+
   // Common state
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState<{
@@ -115,7 +111,7 @@ const SystemSettings: React.FC = () => {
   }>({
     open: false,
     message: '',
-    severity: 'info'
+    severity: 'info',
   });
 
   // Tab handling
@@ -132,7 +128,7 @@ const SystemSettings: React.FC = () => {
     setSnackbar({
       open: true,
       message,
-      severity
+      severity,
     });
   };
 
@@ -185,8 +181,8 @@ const SystemSettings: React.FC = () => {
     try {
       const result = await systemSettingsService.testConnection(connection);
       showSnackbar(
-        result.success 
-          ? `Connection to ${connection.name} successful` 
+        result.success
+          ? `Connection to ${connection.name} successful`
           : `Connection to ${connection.name} failed: ${result.message}`,
         result.success ? 'success' : 'error'
       );
@@ -224,7 +220,7 @@ const SystemSettings: React.FC = () => {
 
   const confirmDeleteConnection = async () => {
     if (!selectedConnection) return;
-    
+
     setLoading(true);
     try {
       await systemSettingsService.deleteConnectionConfig(selectedConnection.id);
@@ -321,7 +317,7 @@ const SystemSettings: React.FC = () => {
 
   const confirmDeleteApiKey = async () => {
     if (!selectedApiKey) return;
-    
+
     setLoading(true);
     try {
       await systemSettingsService.deleteApiKey(selectedApiKey.id);
@@ -338,7 +334,7 @@ const SystemSettings: React.FC = () => {
 
   const confirmRevokeApiKey = async () => {
     if (!selectedApiKey) return;
-    
+
     setLoading(true);
     try {
       await systemSettingsService.revokeApiKey(selectedApiKey.id);
@@ -422,7 +418,7 @@ const SystemSettings: React.FC = () => {
 
   const confirmDeleteBackupConfig = async () => {
     if (!selectedBackupConfig) return;
-    
+
     setLoading(true);
     try {
       await systemSettingsService.deleteBackupConfig(selectedBackupConfig.id);
@@ -475,18 +471,20 @@ const SystemSettings: React.FC = () => {
     setLoading(true);
     try {
       const blob = await systemSettingsService.downloadBackup(record.id);
-      
+
       // Create a download link and trigger it
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `backup-${record.id}-${new Date(record.timestamp).toISOString().split('T')[0]}.zip`;
+      a.download = `backup-${record.id}-${
+        new Date(record.timestamp).toISOString().split('T')[0]
+      }.zip`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       showSnackbar('Backup download started', 'success');
     } catch (error) {
       console.error('Error downloading backup:', error);
@@ -498,18 +496,16 @@ const SystemSettings: React.FC = () => {
 
   const confirmRestoreBackup = async () => {
     if (!selectedBackupRecord) return;
-    
+
     setLoading(true);
     try {
       const result = await systemSettingsService.restoreFromBackup(selectedBackupRecord.id);
       showSnackbar(
-        result.success 
-          ? 'System restored successfully' 
-          : `Restore failed: ${result.message}`,
+        result.success ? 'System restored successfully' : `Restore failed: ${result.message}`,
         result.success ? 'success' : 'error'
       );
       setRestoreBackupDialog(false);
-      
+
       // Reload all data after restore
       loadConnections();
       loadApiKeys();
@@ -544,7 +540,7 @@ const SystemSettings: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         System Settings
       </Typography>
-      
+
       <Paper sx={{ width: '100%', mb: 2 }}>
         <Tabs
           value={tabValue}
@@ -556,7 +552,7 @@ const SystemSettings: React.FC = () => {
           <Tab label="API Keys" {...a11yProps(1)} />
           <Tab label="Backup & Restore" {...a11yProps(2)} />
         </Tabs>
-        
+
         {/* Database Connections Tab */}
         <TabPanel value={tabValue} index={0}>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
@@ -569,7 +565,7 @@ const SystemSettings: React.FC = () => {
               Add Connection
             </Button>
           </Box>
-          
+
           <ConnectionConfigTable
             connections={connections}
             loading={loading}
@@ -585,7 +581,7 @@ const SystemSettings: React.FC = () => {
             onRowsPerPageChange={handleConnectionRowsPerPageChange}
           />
         </TabPanel>
-        
+
         {/* API Keys Tab */}
         <TabPanel value={tabValue} index={1}>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
@@ -598,7 +594,7 @@ const SystemSettings: React.FC = () => {
               Add API Key
             </Button>
           </Box>
-          
+
           <ApiKeyTable
             apiKeys={apiKeys}
             loading={loading}
@@ -614,13 +610,13 @@ const SystemSettings: React.FC = () => {
             onRowsPerPageChange={handleApiKeyRowsPerPageChange}
           />
         </TabPanel>
-        
+
         {/* Backup & Restore Tab */}
         <TabPanel value={tabValue} index={2}>
           <Typography variant="h6" gutterBottom>
             Backup Configurations
           </Typography>
-          
+
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
             <Button
               variant="contained"
@@ -631,7 +627,7 @@ const SystemSettings: React.FC = () => {
               Add Backup Configuration
             </Button>
           </Box>
-          
+
           <BackupConfigTable
             backupConfigs={backupConfigs}
             loading={loading}
@@ -639,13 +635,13 @@ const SystemSettings: React.FC = () => {
             onDelete={handleDeleteBackupConfig}
             onBackupNow={handleBackupNow}
           />
-          
+
           <Divider sx={{ my: 4 }} />
-          
+
           <Typography variant="h6" gutterBottom>
             Backup History
           </Typography>
-          
+
           <BackupRecordsTable
             backupRecords={backupRecords}
             loading={loading}
@@ -661,7 +657,7 @@ const SystemSettings: React.FC = () => {
           />
         </TabPanel>
       </Paper>
-      
+
       {/* Connection Form Dialog */}
       <Dialog
         open={showConnectionForm}
@@ -679,14 +675,9 @@ const SystemSettings: React.FC = () => {
           />
         </DialogContent>
       </Dialog>
-      
+
       {/* API Key Form Dialog */}
-      <Dialog
-        open={showApiKeyForm}
-        onClose={handleApiKeyFormCancel}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={showApiKeyForm} onClose={handleApiKeyFormCancel} maxWidth="md" fullWidth>
         <DialogContent>
           <ApiKeyForm
             initialValues={selectedApiKey || undefined}
@@ -696,7 +687,7 @@ const SystemSettings: React.FC = () => {
           />
         </DialogContent>
       </Dialog>
-      
+
       {/* Backup Config Form Dialog */}
       <Dialog
         open={showBackupConfigForm}
@@ -713,16 +704,14 @@ const SystemSettings: React.FC = () => {
           />
         </DialogContent>
       </Dialog>
-      
+
       {/* Delete Connection Confirmation Dialog */}
-      <Dialog
-        open={deleteConnectionDialog}
-        onClose={() => setDeleteConnectionDialog(false)}
-      >
+      <Dialog open={deleteConnectionDialog} onClose={() => setDeleteConnectionDialog(false)}>
         <DialogTitle>Delete Connection</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the connection "{selectedConnection?.name}"? This action cannot be undone.
+            Are you sure you want to delete the connection &quot;{selectedConnection?.name}&quot;?
+            This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -734,16 +723,14 @@ const SystemSettings: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Delete API Key Confirmation Dialog */}
-      <Dialog
-        open={deleteApiKeyDialog}
-        onClose={() => setDeleteApiKeyDialog(false)}
-      >
+      <Dialog open={deleteApiKeyDialog} onClose={() => setDeleteApiKeyDialog(false)}>
         <DialogTitle>Delete API Key</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the API key "{selectedApiKey?.name}"? This action cannot be undone.
+            Are you sure you want to delete the API key &quot;{selectedApiKey?.name}&quot;? This
+            action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -755,16 +742,14 @@ const SystemSettings: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Revoke API Key Confirmation Dialog */}
-      <Dialog
-        open={revokeApiKeyDialog}
-        onClose={() => setRevokeApiKeyDialog(false)}
-      >
+      <Dialog open={revokeApiKeyDialog} onClose={() => setRevokeApiKeyDialog(false)}>
         <DialogTitle>Revoke API Key</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to revoke the API key "{selectedApiKey?.name}"? This will immediately invalidate the key and it can no longer be used.
+            Are you sure you want to revoke the API key &quot;{selectedApiKey?.name}&quot;? This
+            will immediately invalidate the key and it can no longer be used.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -776,16 +761,15 @@ const SystemSettings: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Delete Backup Config Confirmation Dialog */}
-      <Dialog
-        open={deleteBackupConfigDialog}
-        onClose={() => setDeleteBackupConfigDialog(false)}
-      >
+      <Dialog open={deleteBackupConfigDialog} onClose={() => setDeleteBackupConfigDialog(false)}>
         <DialogTitle>Delete Backup Configuration</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the backup configuration "{selectedBackupConfig?.name}"? This will not delete existing backup files, but scheduled backups will no longer run.
+            Are you sure you want to delete the backup configuration &quot;
+            {selectedBackupConfig?.name}&quot;? This will not delete existing backup files, but
+            scheduled backups will no longer run.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -797,19 +781,19 @@ const SystemSettings: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Restore Backup Confirmation Dialog */}
-      <Dialog
-        open={restoreBackupDialog}
-        onClose={() => setRestoreBackupDialog(false)}
-      >
+      <Dialog open={restoreBackupDialog} onClose={() => setRestoreBackupDialog(false)}>
         <DialogTitle>Restore System</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to restore the system from the backup created on {selectedBackupRecord ? new Date(selectedBackupRecord.timestamp).toLocaleString() : ''}? This will overwrite current system settings and data.
+            Are you sure you want to restore the system from the backup created on{' '}
+            {selectedBackupRecord ? new Date(selectedBackupRecord.timestamp).toLocaleString() : ''}?
+            This will overwrite current system settings and data.
           </DialogContentText>
           <Alert severity="warning" sx={{ mt: 2 }}>
-            Warning: This operation cannot be undone. All users will be disconnected during the restore process.
+            Warning: This operation cannot be undone. All users will be disconnected during the
+            restore process.
           </Alert>
         </DialogContent>
         <DialogActions>
@@ -821,7 +805,7 @@ const SystemSettings: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}

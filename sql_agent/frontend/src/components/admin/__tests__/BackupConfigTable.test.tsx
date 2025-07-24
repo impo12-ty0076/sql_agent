@@ -15,7 +15,7 @@ const mockBackupConfigs: BackupConfig[] = [
     destination: '/backups/daily',
     lastBackupAt: new Date('2023-01-01T12:00:00'),
     nextBackupAt: new Date('2023-01-02T12:00:00'),
-    status: 'active'
+    status: 'active',
   },
   {
     id: '2',
@@ -28,8 +28,8 @@ const mockBackupConfigs: BackupConfig[] = [
     destination: '/backups/weekly',
     lastBackupAt: new Date('2022-12-25T12:00:00'),
     nextBackupAt: new Date('2023-01-01T12:00:00'),
-    status: 'inactive'
-  }
+    status: 'inactive',
+  },
 ];
 
 const mockProps = {
@@ -37,19 +37,19 @@ const mockProps = {
   loading: false,
   onEdit: jest.fn(),
   onDelete: jest.fn(),
-  onBackupNow: jest.fn()
+  onBackupNow: jest.fn(),
 };
 
 describe('BackupConfigTable', () => {
   it('renders backup config table with data', () => {
     render(<BackupConfigTable {...mockProps} />);
-    
+
     // Check if table headers are rendered
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Schedule')).toBeInTheDocument();
     expect(screen.getByText('Retention')).toBeInTheDocument();
     expect(screen.getByText('Included Data')).toBeInTheDocument();
-    
+
     // Check if backup config data is rendered
     expect(screen.getByText('Daily Backup')).toBeInTheDocument();
     expect(screen.getByText('Daily')).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe('BackupConfigTable', () => {
     expect(screen.getByText('Weekly Backup')).toBeInTheDocument();
     expect(screen.getByText('Weekly')).toBeInTheDocument();
     expect(screen.getByText('4 backups')).toBeInTheDocument();
-    
+
     // Check if included data is displayed correctly
     expect(screen.getByText('Settings, User Data, Query History')).toBeInTheDocument();
     expect(screen.getByText('Settings, User Data')).toBeInTheDocument();
@@ -97,10 +97,10 @@ describe('BackupConfigTable', () => {
   it('disables backup now button for inactive configs', () => {
     render(<BackupConfigTable {...mockProps} />);
     const backupNowButtons = screen.getAllByLabelText('Backup Now');
-    
+
     // First button should be enabled (active config)
     expect(backupNowButtons[0]).not.toBeDisabled();
-    
+
     // Second button should be disabled (inactive config)
     expect(backupNowButtons[1]).toBeDisabled();
   });

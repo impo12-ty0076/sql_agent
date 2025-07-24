@@ -78,7 +78,13 @@ interface FilterState {
   operator?: FilterOperator;
 }
 
-type FilterOperator = 'contains' | 'equals' | 'startsWith' | 'endsWith' | 'greaterThan' | 'lessThan';
+type FilterOperator =
+  | 'contains'
+  | 'equals'
+  | 'startsWith'
+  | 'endsWith'
+  | 'greaterThan'
+  | 'lessThan';
 
 interface ColumnVisibility {
   columnIndex: number;
@@ -103,43 +109,47 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+
   // State for pagination
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  
+
   // State for sorting
   const [orderBy, setOrderBy] = useState<number | null>(null);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-  
+
   // State for filtering
   const [filters, setFilters] = useState<FilterState[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [filterMenuAnchorEl, setFilterMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [filterColumnIndex, setFilterColumnIndex] = useState<number | null>(null);
   const [filterOperator, setFilterOperator] = useState<FilterOperator>('contains');
-  
+
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility[]>([]);
   const [columnMenuAnchorEl, setColumnMenuAnchorEl] = useState<null | HTMLElement>(null);
-  
+
   // State for cell detail view
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [detailContent, setDetailContent] = useState<string>('');
   const [detailTitle, setDetailTitle] = useState<string>('');
-  
+
   // State for notifications
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
-  
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    'success' | 'error' | 'warning' | 'info'
+  >('success');
+
   // Initialize column visibility when columns change
   useEffect(() => {
     if (columns.length) {
-      setColumnVisibility(columns.map((_, index) => ({
-        columnIndex: index,
-        visible: true
-      })));
+      setColumnVisibility(
+        columns.map((_, index) => ({
+          columnIndex: index,
+          visible: true,
+        }))
+      );
     }
   }, [columns]);
 
@@ -172,47 +182,43 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
     if (filterColumnIndex !== null) {
       // Remove existing filter for this column if it exists
       const newFilters = filters.filter(f => f.columnIndex !== filterColumnIndex);
-      
+
       // Add new filter if value is not empty
       if (value.trim()) {
         newFilters.push({
           columnIndex: filterColumnIndex,
           value: value.trim(),
-          operator: filterOperator
+          operator: filterOperator,
         });
       }
-      
+
       setFilters(newFilters);
       handleFilterMenuClose();
     }
   };
-  
+
   // Handle filter operator change
   const handleFilterOperatorChange = (event: SelectChangeEvent<FilterOperator>) => {
     setFilterOperator(event.target.value as FilterOperator);
   };
-  
+
   // Handle column visibility toggle
   const handleColumnVisibilityToggle = (columnIndex: number) => {
-    setColumnVisibility(prev => 
-      prev.map(col => 
-        col.columnIndex === columnIndex 
-          ? { ...col, visible: !col.visible } 
-          : col
-      )
+    setColumnVisibility(prev =>
+      prev.map(col => (col.columnIndex === columnIndex ? { ...col, visible: !col.visible } : col))
     );
   };
-  
+
   // Handle column menu open
   const handleColumnMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setColumnMenuAnchorEl(event.currentTarget);
   };
-  
+
   // Handle column menu close
   const handleColumnMenuClose = () => {
     setColumnMenuAnchorEl(null);
   };
-  
+
   // Handle cell detail view
   const handleCellDetail = (content: any, columnName: string) => {
     if (content !== null && content !== undefined) {
@@ -221,7 +227,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
       setDetailDialogOpen(true);
     }
   };
-  
+
   // Handle detail dialog close
   const handleDetailDialogClose = () => {
     setDetailDialogOpen(false);
@@ -255,7 +261,10 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
   };
 
   // Show notification
-  const showNotification = (message: string, severity: 'success' | 'error' | 'warning' | 'info' = 'success') => {
+  const showNotification = (
+    message: string,
+    severity: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ) => {
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
     setSnackbarOpen(true);
@@ -266,16 +275,23 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
     try {
       // Create a string representation of the data
       const visibleColumnNames = columns
-        .filter((_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true)
+        .filter(
+          (_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true
+        )
         .map(col => col.name);
-      
+
       const headers = visibleColumnNames.join('\t');
-      const data = filteredAndSortedRows.map(row => 
-        row.filter((_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true)
-          .join('\t')
-      ).join('\n');
+      const data = filteredAndSortedRows
+        .map(row =>
+          row
+            .filter(
+              (_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true
+            )
+            .join('\t')
+        )
+        .join('\n');
       const text = `${headers}\n${data}`;
-      
+
       await navigator.clipboard.writeText(text);
       showNotification(`${filteredAndSortedRows.length}개 행이 클립보드에 복사되었습니다.`);
     } catch (err) {
@@ -289,29 +305,39 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
     try {
       // Create CSV content with only visible columns
       const visibleColumnNames = columns
-        .filter((_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true)
+        .filter(
+          (_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true
+        )
         .map(col => col.name);
-      
+
       const headers = visibleColumnNames.map(name => `"${name}"`).join(',');
-      const data = filteredAndSortedRows.map(row => 
-        row.filter((_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true)
-          .map(cell => `"${String(cell || '').replace(/"/g, '""')}"`)
-          .join(',')
-      ).join('\n');
+      const data = filteredAndSortedRows
+        .map(row =>
+          row
+            .filter(
+              (_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true
+            )
+            .map(cell => `"${String(cell || '').replace(/"/g, '""')}"`)
+            .join(',')
+        )
+        .join('\n');
       const csv = `${headers}\n${data}`;
-      
+
       // Create download link
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `query_result_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`);
+      link.setAttribute(
+        'download',
+        `query_result_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`
+      );
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
+
       showNotification(`${filteredAndSortedRows.length}개 행이 CSV 파일로 다운로드되었습니다.`);
     } catch (err) {
       console.error('Could not download CSV: ', err);
@@ -323,7 +349,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
   const applyFilter = useCallback((cellValue: any, filter: FilterState): boolean => {
     const strValue = String(cellValue || '').toLowerCase();
     const filterValue = filter.value.toLowerCase();
-    
+
     switch (filter.operator) {
       case 'equals':
         return strValue === filterValue;
@@ -356,19 +382,19 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
   // Apply filters to rows
   const filteredRows = useMemo(() => {
     if (!rows.length) return [];
-    
+
     return rows.filter(row => {
       // Apply column-specific filters
       const passesColumnFilters = filters.every(filter => {
         const cellValue = row[filter.columnIndex];
         return applyFilter(cellValue, filter);
       });
-      
+
       // Apply global filter
-      const passesGlobalFilter = !globalFilter || row.some(cell => 
-        String(cell).toLowerCase().includes(globalFilter.toLowerCase())
-      );
-      
+      const passesGlobalFilter =
+        !globalFilter ||
+        row.some(cell => String(cell).toLowerCase().includes(globalFilter.toLowerCase()));
+
       return passesColumnFilters && passesGlobalFilter;
     });
   }, [rows, filters, globalFilter, applyFilter]);
@@ -376,25 +402,23 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
   // Apply sorting to filtered rows
   const filteredAndSortedRows = useMemo(() => {
     if (!filteredRows.length) return [];
-    
+
     if (orderBy === null) return filteredRows;
-    
+
     return [...filteredRows].sort((a, b) => {
       const aValue = a[orderBy];
       const bValue = b[orderBy];
-      
+
       // Handle different types of values
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return order === 'asc' ? aValue - bValue : bValue - aValue;
       }
-      
+
       // Default string comparison
       const aString = String(aValue || '').toLowerCase();
       const bString = String(bValue || '').toLowerCase();
-      
-      return order === 'asc' 
-        ? aString.localeCompare(bString)
-        : bString.localeCompare(aString);
+
+      return order === 'asc' ? aString.localeCompare(bString) : bString.localeCompare(aString);
     });
   }, [filteredRows, orderBy, order]);
 
@@ -407,39 +431,44 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
   // Get visible columns
   const visibleColumns = useMemo(() => {
     if (!columnVisibility.length) return columns;
-    return columns.filter((_, index) => 
-      columnVisibility.find(col => col.columnIndex === index)?.visible ?? true
+    return columns.filter(
+      (_, index) => columnVisibility.find(col => col.columnIndex === index)?.visible ?? true
     );
   }, [columns, columnVisibility]);
-  
+
   // Get visible column indices
   const visibleColumnIndices = useMemo(() => {
-    return columnVisibility
-      .filter(col => col.visible)
-      .map(col => col.columnIndex);
+    return columnVisibility.filter(col => col.visible).map(col => col.columnIndex);
   }, [columnVisibility]);
-  
+
   // Get visible column count for colSpan
   const visibleColumnCount = useMemo(() => {
-    const baseCount = columnVisibility.length ? columnVisibility.filter(col => col.visible).length : columns.length;
+    const baseCount = columnVisibility.length
+      ? columnVisibility.filter(col => col.visible).length
+      : columns.length;
     return showRowNumbers ? baseCount + 1 : baseCount;
   }, [columnVisibility, columns.length, showRowNumbers]);
 
   // Highlight search terms in text
-  const highlightText = useCallback((text: string, searchTerm: string) => {
-    if (!highlightSearchTerms || !searchTerm.trim()) return text;
-    
-    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    const parts = text.split(regex);
-    
-    return parts.map((part, index) => 
-      regex.test(part) ? (
-        <mark key={index} style={{ backgroundColor: '#ffeb3b', padding: '0 2px' }}>
-          {part}
-        </mark>
-      ) : part
-    );
-  }, [highlightSearchTerms]);
+  const highlightText = useCallback(
+    (text: string, searchTerm: string) => {
+      if (!highlightSearchTerms || !searchTerm.trim()) return text;
+
+      const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      const parts = text.split(regex);
+
+      return parts.map((part, index) =>
+        regex.test(part) ? (
+          <mark key={index} style={{ backgroundColor: '#ffeb3b', padding: '0 2px' }}>
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      );
+    },
+    [highlightSearchTerms]
+  );
 
   // If no data
   if (!columns.length) {
@@ -449,19 +478,16 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
       </Paper>
     );
   }
-  
+
   // If error
   if (error) {
     return (
       <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="body1" color="error">오류 발생: {error}</Typography>
+        <Typography variant="body1" color="error">
+          오류 발생: {error}
+        </Typography>
         {onRefresh && (
-          <Button 
-            startIcon={<RefreshIcon />} 
-            onClick={onRefresh}
-            variant="outlined"
-            sx={{ mt: 2 }}
-          >
+          <Button startIcon={<RefreshIcon />} onClick={onRefresh} variant="outlined" sx={{ mt: 2 }}>
             다시 시도
           </Button>
         )}
@@ -472,9 +498,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">
-          쿼리 결과
-        </Typography>
+        <Typography variant="h6">쿼리 결과</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Tooltip title="컬럼 표시 설정">
             <IconButton onClick={handleColumnMenuOpen} size="small">
@@ -493,12 +517,12 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
           </Tooltip>
         </Box>
       </Box>
-      
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Box>
           <Typography variant="body2" color="text.secondary">
-            {filteredRows.length === rowCount 
-              ? `총 ${rowCount}개의 행이 조회되었습니다.` 
+            {filteredRows.length === rowCount
+              ? `총 ${rowCount}개의 행이 조회되었습니다.`
               : `${filteredRows.length} / ${rowCount}개의 행이 표시되고 있습니다.`}
             {truncated && totalRowCount && ` (전체 ${totalRowCount}개 중 일부)`}
           </Typography>
@@ -508,7 +532,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
             </Typography>
           )}
         </Box>
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <TextField
             variant="outlined"
@@ -524,11 +548,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
               ),
               endAdornment: globalFilter && (
                 <InputAdornment position="end">
-                  <IconButton
-                    size="small"
-                    onClick={() => setGlobalFilter('')}
-                    edge="end"
-                  >
+                  <IconButton size="small" onClick={() => setGlobalFilter('')} edge="end">
                     <ClearIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
@@ -536,7 +556,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
             }}
             sx={{ width: 200 }}
           />
-          
+
           {filters.length > 0 && (
             <Tooltip title="모든 필터 지우기">
               <IconButton size="small" onClick={handleClearAllFilters} sx={{ ml: 1 }}>
@@ -546,7 +566,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
           )}
         </Box>
       </Box>
-      
+
       {/* Active filters display */}
       {filters.length > 0 && (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
@@ -562,9 +582,9 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
           ))}
         </Box>
       )}
-      
+
       {loading && <LinearProgress sx={{ mb: 2 }} />}
-      
+
       <TableContainer sx={{ maxHeight }}>
         <Table stickyHeader={stickyHeader} size="small">
           <TableHead>
@@ -576,14 +596,12 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
               )}
               {columns.map((column, index) => {
                 // Check if column is visible
-                const isVisible = columnVisibility.find(col => col.columnIndex === index)?.visible ?? true;
+                const isVisible =
+                  columnVisibility.find(col => col.columnIndex === index)?.visible ?? true;
                 if (!isVisible) return null;
-                
+
                 return (
-                  <TableCell 
-                    key={index}
-                    sortDirection={orderBy === index ? order : false}
-                  >
+                  <TableCell key={index} sortDirection={orderBy === index ? order : false}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <TableSortLabel
                         active={orderBy === index}
@@ -592,11 +610,11 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
                       >
                         <Typography variant="subtitle2">{column.name}</Typography>
                       </TableSortLabel>
-                      
+
                       <Tooltip title="필터">
                         <IconButton
                           size="small"
-                          onClick={(e) => handleFilterMenuOpen(e, index)}
+                          onClick={e => handleFilterMenuOpen(e, index)}
                           sx={{ ml: 0.5 }}
                         >
                           <FilterIcon fontSize="small" />
@@ -612,92 +630,90 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading && currentPageRows.length === 0 ? (
-              // Show skeleton loading rows
-              Array(rowsPerPage).fill(null).map((_, skeletonIndex) => (
-                <TableRow key={`skeleton-${skeletonIndex}`}>
-                  {showRowNumbers && (
-                    <TableCell>
-                      <Skeleton variant="text" width={30} />
-                    </TableCell>
-                  )}
-                  {columns.map((_, colIndex) => {
-                    const isVisible = columnVisibility.find(col => col.columnIndex === colIndex)?.visible ?? true;
-                    if (!isVisible) return null;
-                    
-                    return (
-                      <TableCell key={colIndex}>
-                        <Skeleton variant="text" width="80%" />
+            {loading && currentPageRows.length === 0
+              ? // Show skeleton loading rows
+                Array(rowsPerPage)
+                  .fill(null)
+                  .map((_, skeletonIndex) => (
+                    <TableRow key={`skeleton-${skeletonIndex}`}>
+                      {showRowNumbers && (
+                        <TableCell>
+                          <Skeleton variant="text" width={30} />
+                        </TableCell>
+                      )}
+                      {columns.map((_, colIndex) => {
+                        const isVisible =
+                          columnVisibility.find(col => col.columnIndex === colIndex)?.visible ??
+                          true;
+                        if (!isVisible) return null;
+
+                        return (
+                          <TableCell key={colIndex}>
+                            <Skeleton variant="text" width="80%" />
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  ))
+              : currentPageRows.map((row, rowIndex) => (
+                  <TableRow
+                    key={rowIndex}
+                    hover
+                    onClick={() => onRowClick?.(row, page * rowsPerPage + rowIndex)}
+                    sx={{ cursor: onRowClick ? 'pointer' : 'default' }}
+                  >
+                    {showRowNumbers && (
+                      <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                        {page * rowsPerPage + rowIndex + 1}
                       </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))
-            ) : (
-              currentPageRows.map((row, rowIndex) => (
-                <TableRow 
-                  key={rowIndex} 
-                  hover 
-                  onClick={() => onRowClick?.(row, page * rowsPerPage + rowIndex)}
-                  sx={{ cursor: onRowClick ? 'pointer' : 'default' }}
-                >
-                  {showRowNumbers && (
-                    <TableCell sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
-                      {page * rowsPerPage + rowIndex + 1}
-                    </TableCell>
-                  )}
-                  {row.map((cell, cellIndex) => {
-                  // Check if column is visible
-                  const isVisible = columnVisibility.find(col => col.columnIndex === cellIndex)?.visible ?? true;
-                  if (!isVisible) return null;
-                  
-                  const columnName = columns[cellIndex]?.name || '';
-                  const cellContent = cell !== null && cell !== undefined ? cell : '';
-                  const cellStr = String(cellContent);
-                  const isTruncated = cellStr.length > 100;
-                  
-                  return (
-                    <TableCell 
-                      key={cellIndex}
-                      onClick={() => isTruncated && handleCellDetail(cellContent, columnName)}
-                      sx={{ 
-                        cursor: isTruncated ? 'pointer' : 'default',
-                        maxWidth: '200px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      <Tooltip title={isTruncated ? "클릭하여 전체 내용 보기" : ""}>
-                        <span>
-                          {isTruncated 
-                            ? highlightText(`${cellStr.substring(0, 100)}...`, globalFilter)
-                            : highlightText(cellStr, globalFilter)
-                          }
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                  );
-                  })}
-                </TableRow>
-              ))
-            )}
+                    )}
+                    {row.map((cell, cellIndex) => {
+                      // Check if column is visible
+                      const isVisible =
+                        columnVisibility.find(col => col.columnIndex === cellIndex)?.visible ??
+                        true;
+                      if (!isVisible) return null;
+
+                      const columnName = columns[cellIndex]?.name || '';
+                      const cellContent = cell !== null && cell !== undefined ? cell : '';
+                      const cellStr = String(cellContent);
+                      const isTruncated = cellStr.length > 100;
+
+                      return (
+                        <TableCell
+                          key={cellIndex}
+                          onClick={() => isTruncated && handleCellDetail(cellContent, columnName)}
+                          sx={{
+                            cursor: isTruncated ? 'pointer' : 'default',
+                            maxWidth: '200px',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          <Tooltip title={isTruncated ? '클릭하여 전체 내용 보기' : ''}>
+                            <span>
+                              {isTruncated
+                                ? highlightText(`${cellStr.substring(0, 100)}...`, globalFilter)
+                                : highlightText(cellStr, globalFilter)}
+                            </span>
+                          </Tooltip>
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
             {!loading && currentPageRows.length === 0 && (
               <TableRow>
                 <TableCell colSpan={visibleColumnCount} align="center">
                   <Box sx={{ py: 4 }}>
                     <Typography variant="body2" color="text.secondary">
-                      {filteredRows.length === 0 && (filters.length > 0 || globalFilter) 
-                        ? '필터 조건에 맞는 결과가 없습니다.' 
-                        : '결과가 없습니다.'
-                      }
+                      {filteredRows.length === 0 && (filters.length > 0 || globalFilter)
+                        ? '필터 조건에 맞는 결과가 없습니다.'
+                        : '결과가 없습니다.'}
                     </Typography>
                     {filteredRows.length === 0 && (filters.length > 0 || globalFilter) && (
-                      <Button 
-                        size="small" 
-                        onClick={handleClearAllFilters}
-                        sx={{ mt: 1 }}
-                      >
+                      <Button size="small" onClick={handleClearAllFilters} sx={{ mt: 1 }}>
                         모든 필터 지우기
                       </Button>
                     )}
@@ -708,7 +724,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
           </TableBody>
         </Table>
       </TableContainer>
-      
+
       <TablePagination
         component="div"
         count={filteredAndSortedRows.length}
@@ -720,7 +736,7 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
         labelRowsPerPage="행 수:"
         labelDisplayedRows={({ from, to, count }) => `${from}-${to} / ${count}`}
       />
-      
+
       {/* Filter menu */}
       <Menu
         anchorEl={filterMenuAnchorEl}
@@ -731,14 +747,10 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
           <Typography variant="subtitle2" gutterBottom>
             {filterColumnIndex !== null && columns[filterColumnIndex]?.name} 필터
           </Typography>
-          
+
           <FormControl fullWidth size="small" sx={{ mb: 2 }}>
             <InputLabel>연산자</InputLabel>
-            <Select
-              value={filterOperator}
-              onChange={handleFilterOperatorChange}
-              label="연산자"
-            >
+            <Select value={filterOperator} onChange={handleFilterOperatorChange} label="연산자">
               <MenuItem value="contains">포함</MenuItem>
               <MenuItem value="equals">일치</MenuItem>
               <MenuItem value="startsWith">시작</MenuItem>
@@ -747,16 +759,18 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
               <MenuItem value="lessThan">미만</MenuItem>
             </Select>
           </FormControl>
-          
+
           <TextField
             autoFocus
             fullWidth
             size="small"
             placeholder="필터 값 입력..."
-            defaultValue={filterColumnIndex !== null 
-              ? filters.find(f => f.columnIndex === filterColumnIndex)?.value || '' 
-              : ''}
-            onKeyDown={(e) => {
+            defaultValue={
+              filterColumnIndex !== null
+                ? filters.find(f => f.columnIndex === filterColumnIndex)?.value || ''
+                : ''
+            }
+            onKeyDown={e => {
               if (e.key === 'Enter') {
                 handleFilterApply((e.target as HTMLInputElement).value);
               }
@@ -766,9 +780,10 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
                 <InputAdornment position="end">
                   <IconButton
                     size="small"
-                    onClick={(e) => {
-                      const input = (e.currentTarget.parentNode as HTMLElement)
-                        .querySelector('input') as HTMLInputElement;
+                    onClick={e => {
+                      const input = (e.currentTarget.parentNode as HTMLElement).querySelector(
+                        'input'
+                      ) as HTMLInputElement;
                       handleFilterApply(input.value);
                     }}
                   >
@@ -778,26 +793,26 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
               ),
             }}
           />
-          
+
           <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between' }}>
             <Typography variant="caption" color="text.secondary">
               Enter 키를 눌러 적용
             </Typography>
-            {filterColumnIndex !== null && 
+            {filterColumnIndex !== null &&
               filters.some(f => f.columnIndex === filterColumnIndex) && (
-              <Typography 
-                variant="caption" 
-                color="primary" 
-                sx={{ cursor: 'pointer' }}
-                onClick={() => handleFilterRemove(filterColumnIndex)}
-              >
-                필터 제거
-              </Typography>
-            )}
+                <Typography
+                  variant="caption"
+                  color="primary"
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => handleFilterRemove(filterColumnIndex)}
+                >
+                  필터 제거
+                </Typography>
+              )}
           </Box>
         </Box>
       </Menu>
-      
+
       {/* Column visibility menu */}
       <Menu
         anchorEl={columnMenuAnchorEl}
@@ -809,42 +824,43 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
             컬럼 표시 설정
           </Typography>
           <Divider sx={{ my: 1 }} />
-          {columnVisibility.map((col) => (
-            <MenuItem key={col.columnIndex} onClick={() => handleColumnVisibilityToggle(col.columnIndex)}>
-              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-                <Typography variant="body2">
-                  {columns[col.columnIndex]?.name}
-                </Typography>
-                {col.visible ? <VisibilityIcon fontSize="small" color="primary" /> : <VisibilityOffIcon fontSize="small" />}
+          {columnVisibility.map(col => (
+            <MenuItem
+              key={col.columnIndex}
+              onClick={() => handleColumnVisibilityToggle(col.columnIndex)}
+            >
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Typography variant="body2">{columns[col.columnIndex]?.name}</Typography>
+                {col.visible ? (
+                  <VisibilityIcon fontSize="small" color="primary" />
+                ) : (
+                  <VisibilityOffIcon fontSize="small" />
+                )}
               </Box>
             </MenuItem>
           ))}
         </Box>
       </Menu>
-      
+
       {/* Cell detail dialog */}
-      <Dialog
-        open={detailDialogOpen}
-        onClose={handleDetailDialogClose}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={detailDialogOpen} onClose={handleDetailDialogClose} maxWidth="md" fullWidth>
         <DialogTitle>{detailTitle}</DialogTitle>
         <DialogContent dividers>
-          <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-            {detailContent}
-          </Box>
+          <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{detailContent}</Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => navigator.clipboard.writeText(detailContent)}>
-            복사
-          </Button>
-          <Button onClick={handleDetailDialogClose}>
-            닫기
-          </Button>
+          <Button onClick={() => navigator.clipboard.writeText(detailContent)}>복사</Button>
+          <Button onClick={handleDetailDialogClose}>닫기</Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Notification snackbar */}
       <Snackbar
         open={snackbarOpen}
@@ -852,8 +868,8 @@ const EnhancedResultTable: React.FC<EnhancedResultTableProps> = ({
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert 
-          onClose={() => setSnackbarOpen(false)} 
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
           variant="filled"
           icon={snackbarSeverity === 'success' ? <CheckCircleIcon /> : undefined}

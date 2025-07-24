@@ -59,7 +59,7 @@ class ReportGenerationStatusResponse(BaseModel):
 
 # Create router
 router = APIRouter(
-    prefix="/api/results",
+    prefix="/results",
     tags=["results"],
     responses={404: {"description": "Not found"}},
 )

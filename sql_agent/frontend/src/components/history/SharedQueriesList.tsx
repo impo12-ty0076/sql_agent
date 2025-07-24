@@ -18,7 +18,7 @@ import {
   DialogContentText,
   DialogActions,
   Snackbar,
-  Alert
+  Alert,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -41,7 +41,7 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
   historyId,
   shareLinks,
   loading,
-  error
+  error,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -71,7 +71,7 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
 
   const handleConfirmDelete = async () => {
     if (!shareToDelete) return;
-    
+
     try {
       await dispatch(deleteShareLink(shareToDelete)).unwrap();
       showSnackbar('공유 링크가 삭제되었습니다.', 'success');
@@ -109,7 +109,7 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
       <Typography variant="h6" gutterBottom>
         공유된 링크
       </Typography>
-      
+
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
           <CircularProgress size={24} />
@@ -136,8 +136,8 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
                           {shareLink.share_link}
                         </Typography>
                         <Tooltip title="링크 복사">
-                          <IconButton 
-                            size="small" 
+                          <IconButton
+                            size="small"
                             onClick={() => handleCopyLink(shareLink.share_link)}
                           >
                             <ContentCopyIcon fontSize="small" />
@@ -148,11 +148,17 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
                     secondary={
                       <Box>
                         <Typography variant="caption" display="block">
-                          생성일: {format(new Date(shareLink.created_at), 'yyyy년 MM월 dd일', { locale: ko })}
+                          생성일:{' '}
+                          {format(new Date(shareLink.created_at), 'yyyy년 MM월 dd일', {
+                            locale: ko,
+                          })}
                         </Typography>
                         {shareLink.expires_at && (
                           <Typography variant="caption" display="block">
-                            만료일: {format(new Date(shareLink.expires_at), 'yyyy년 MM월 dd일', { locale: ko })}
+                            만료일:{' '}
+                            {format(new Date(shareLink.expires_at), 'yyyy년 MM월 dd일', {
+                              locale: ko,
+                            })}
                           </Typography>
                         )}
                         {shareLink.allowed_users && shareLink.allowed_users.length > 0 && (
@@ -165,9 +171,9 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
                   />
                   <ListItemSecondaryAction>
                     <Tooltip title="수정">
-                      <IconButton 
-                        edge="end" 
-                        aria-label="edit" 
+                      <IconButton
+                        edge="end"
+                        aria-label="edit"
                         onClick={() => handleEditShare(shareLink)}
                         size="small"
                       >
@@ -175,9 +181,9 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="삭제">
-                      <IconButton 
-                        edge="end" 
-                        aria-label="delete" 
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
                         onClick={() => handleDeleteClick(shareLink.id)}
                         size="small"
                       >
@@ -191,7 +197,7 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
           </List>
         </Paper>
       )}
-      
+
       {/* Edit Share Dialog */}
       {selectedShareLink && (
         <ShareQueryDialog
@@ -202,16 +208,13 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
             id: selectedShareLink.id,
             link: selectedShareLink.share_link,
             expiresAt: selectedShareLink.expires_at,
-            allowedUsers: selectedShareLink.allowed_users
+            allowedUsers: selectedShareLink.allowed_users,
           }}
         />
       )}
-      
+
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={deleteDialogOpen}
-        onClose={handleCancelDelete}
-      >
+      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
         <DialogTitle>공유 링크 삭제</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -225,7 +228,7 @@ const SharedQueriesList: React.FC<SharedQueriesListProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}

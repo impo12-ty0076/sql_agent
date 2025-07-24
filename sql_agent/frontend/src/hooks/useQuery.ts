@@ -17,18 +17,18 @@ export const useQuery = (): UseQueryResult => {
   const processQuery = useCallback(async (dbId: string, naturalLanguage: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // 자연어 질의 처리
       const nlResponse = await queryAPI.processNaturalLanguage(dbId, naturalLanguage);
       const data = nlResponse.data as { query_id: string; generated_sql: string };
       const { generated_sql } = data;
-      
+
       // SQL 쿼리 실행
       const executeResponse = await queryAPI.executeQuery(dbId, generated_sql);
       const executeData = executeResponse.data as { result_id: string };
       const { result_id } = executeData;
-      
+
       // 쿼리 결과 조회
       await getQueryResult(result_id);
     } catch (err: any) {
@@ -42,7 +42,7 @@ export const useQuery = (): UseQueryResult => {
   const getQueryResult = useCallback(async (resultId: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const response = await resultAPI.getQueryResult(resultId);
       setQueryResult(response.data);

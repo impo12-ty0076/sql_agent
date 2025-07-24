@@ -18,7 +18,7 @@ import {
   FormHelperText,
   CircularProgress,
   Snackbar,
-  Alert
+  Alert,
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useDispatch } from 'react-redux';
@@ -52,7 +52,7 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
   open,
   onClose,
   historyId,
-  existingShareLink
+  existingShareLink,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [shareLink, setShareLink] = useState(existingShareLink?.link || '');
@@ -69,22 +69,26 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
     try {
       if (existingShareLink) {
         // Update existing share link
-        const result = await dispatch(updateShareLink({
-          shareId: existingShareLink.id,
-          expiresInDays: parseInt(shareExpiry, 10),
-          allowedUsers
-        })).unwrap();
-        
+        const result = await dispatch(
+          updateShareLink({
+            shareId: existingShareLink.id,
+            expiresInDays: parseInt(shareExpiry, 10),
+            allowedUsers,
+          })
+        ).unwrap();
+
         setShareLink(result.share_link);
         showSnackbar('공유 링크가 업데이트되었습니다.', 'success');
       } else {
         // Create new share link
-        const result = await dispatch(createShareLink({
-          historyId,
-          expiresInDays: parseInt(shareExpiry, 10),
-          allowedUsers: allowedUsers.length > 0 ? allowedUsers : undefined
-        })).unwrap();
-        
+        const result = await dispatch(
+          createShareLink({
+            historyId,
+            expiresInDays: parseInt(shareExpiry, 10),
+            allowedUsers: allowedUsers.length > 0 ? allowedUsers : undefined,
+          })
+        ).unwrap();
+
         setShareLink(result.share_link);
         showSnackbar('공유 링크가 생성되었습니다.', 'success');
       }
@@ -98,7 +102,7 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
 
   const handleDeleteShareLink = async () => {
     if (!existingShareLink) return;
-    
+
     setLoading(true);
     try {
       await dispatch(deleteShareLink(existingShareLink.id)).unwrap();
@@ -145,9 +149,10 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
         <DialogTitle>쿼리 공유</DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            이 쿼리를 다른 사용자와 공유할 수 있습니다. 링크 만료 기간을 선택하고 특정 사용자에게만 접근을 허용할 수 있습니다.
+            이 쿼리를 다른 사용자와 공유할 수 있습니다. 링크 만료 기간을 선택하고 특정 사용자에게만
+            접근을 허용할 수 있습니다.
           </DialogContentText>
-          
+
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
             <FormControl fullWidth>
               <InputLabel id="expiry-select-label">만료 기간</InputLabel>
@@ -156,7 +161,7 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
                 id="expiry-select"
                 value={shareExpiry}
                 label="만료 기간"
-                onChange={(e) => setShareExpiry(e.target.value)}
+                onChange={e => setShareExpiry(e.target.value)}
                 disabled={loading}
               >
                 <MenuItem value="1">1일</MenuItem>
@@ -167,7 +172,7 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
                 <MenuItem value="0">만료 없음</MenuItem>
               </Select>
             </FormControl>
-            
+
             <FormControl fullWidth>
               <InputLabel id="allowed-users-label">접근 허용 사용자</InputLabel>
               <Select
@@ -176,9 +181,9 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
                 multiple
                 value={allowedUsers}
                 input={<OutlinedInput id="select-multiple-chip" label="접근 허용 사용자" />}
-                renderValue={(selected) => (
+                renderValue={selected => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value) => (
+                    {selected.map(value => (
                       <Chip key={value} label={value} onDelete={() => handleRemoveUser(value)} />
                     ))}
                   </Box>
@@ -186,7 +191,7 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
                 MenuProps={MenuProps}
                 disabled={loading}
               >
-                {allowedUsers.map((user) => (
+                {allowedUsers.map(user => (
                   <MenuItem key={user} value={user}>
                     {user}
                   </MenuItem>
@@ -194,25 +199,21 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
               </Select>
               <FormHelperText>비워두면 링크가 있는 모든 사용자가 접근할 수 있습니다</FormHelperText>
             </FormControl>
-            
+
             <Box sx={{ display: 'flex', gap: 1 }}>
               <TextField
                 label="사용자 추가"
                 value={newUser}
-                onChange={(e) => setNewUser(e.target.value)}
+                onChange={e => setNewUser(e.target.value)}
                 fullWidth
                 placeholder="사용자 이메일 또는 ID 입력"
                 disabled={loading}
               />
-              <Button 
-                variant="outlined" 
-                onClick={handleAddUser} 
-                disabled={!newUser || loading}
-              >
+              <Button variant="outlined" onClick={handleAddUser} disabled={!newUser || loading}>
                 추가
               </Button>
             </Box>
-            
+
             {shareLink && (
               <Box sx={{ mt: 2 }}>
                 <TextField
@@ -233,29 +234,33 @@ const ShareQueryDialog: React.FC<ShareQueryDialogProps> = ({
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>닫기</Button>
-          
+          <Button onClick={onClose} disabled={loading}>
+            닫기
+          </Button>
+
           {existingShareLink && (
-            <Button 
-              onClick={handleDeleteShareLink} 
-              color="error" 
-              disabled={loading}
-            >
+            <Button onClick={handleDeleteShareLink} color="error" disabled={loading}>
               {loading ? <CircularProgress size={24} /> : '링크 삭제'}
             </Button>
           )}
-          
-          <Button 
-            onClick={handleCreateOrUpdateShareLink} 
-            variant="contained" 
+
+          <Button
+            onClick={handleCreateOrUpdateShareLink}
+            variant="contained"
             color="primary"
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} /> : existingShareLink ? '링크 업데이트' : '링크 생성'}
+            {loading ? (
+              <CircularProgress size={24} />
+            ) : existingShareLink ? (
+              '링크 업데이트'
+            ) : (
+              '링크 생성'
+            )}
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

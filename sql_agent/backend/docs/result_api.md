@@ -317,10 +317,10 @@ status_url = f"http://localhost:8000/api/report/{report_id}/status"
 while True:
     response = requests.get(status_url, headers=headers)
     status_data = response.json()
-    
+
     if status_data["status"] == "completed":
         break
-        
+
     print(f"Progress: {status_data['progress']}%")
     time.sleep(2)
 

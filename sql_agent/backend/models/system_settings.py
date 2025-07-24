@@ -53,7 +53,7 @@ class SystemSettingResponse(BaseModel):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DatabaseConnectionCreate(BaseModel):
@@ -96,7 +96,7 @@ class DatabaseConnectionResponse(BaseModel):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ApiKeyCreate(BaseModel):
@@ -124,7 +124,7 @@ class ApiKeyResponse(BaseModel):
     updated_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SystemBackupCreate(BaseModel):
@@ -146,7 +146,7 @@ class SystemBackupResponse(BaseModel):
     created_by: Optional[str] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SystemRestoreRequest(BaseModel):

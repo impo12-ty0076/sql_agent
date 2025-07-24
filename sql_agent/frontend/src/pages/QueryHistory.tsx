@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Divider, 
-  CircularProgress,
-  Alert,
-  Snackbar
-} from '@mui/material';
+import { Box, Typography, Paper, Divider, CircularProgress, Alert, Snackbar } from '@mui/material';
 import { AppDispatch, RootState } from '../store';
 import { fetchQueryHistory } from '../services/historyService';
 import { clearError } from '../store/slices/historySlice';
@@ -18,7 +10,9 @@ import HistoryDetail from '../components/history/HistoryDetail';
 
 const QueryHistory: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { items, loading, error, filters, selectedItem } = useSelector((state: RootState) => state.history);
+  const { items, loading, error, filters, selectedItem } = useSelector(
+    (state: RootState) => state.history
+  );
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -45,45 +39,59 @@ const QueryHistory: React.FC = () => {
       <Typography variant="h4" component="h1" gutterBottom>
         쿼리 이력 관리
       </Typography>
-      
+
       <Box sx={{ mb: 2 }}>
         <HistoryFilters />
       </Box>
-      
+
       <Divider sx={{ mb: 2 }} />
-      
+
       <Box sx={{ display: 'flex', flexGrow: 1, gap: 2, height: 'calc(100% - 120px)' }}>
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            width: '40%', 
-            p: 2, 
+        <Paper
+          elevation={3}
+          sx={{
+            width: '40%',
+            p: 2,
             overflow: 'auto',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
           }}
         >
           {loading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+              }}
+            >
               <CircularProgress />
             </Box>
           ) : (
             <HistoryList items={items} />
           )}
         </Paper>
-        
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            width: '60%', 
-            p: 2, 
-            overflow: 'auto' 
+
+        <Paper
+          elevation={3}
+          sx={{
+            width: '60%',
+            p: 2,
+            overflow: 'auto',
           }}
         >
           {selectedItem ? (
             <HistoryDetail item={selectedItem} />
           ) : (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+              }}
+            >
               <Typography variant="body1" color="text.secondary">
                 이력 항목을 선택하여 상세 정보를 확인하세요
               </Typography>
@@ -91,10 +99,10 @@ const QueryHistory: React.FC = () => {
           )}
         </Paper>
       </Box>
-      
-      <Snackbar 
-        open={snackbarOpen} 
-        autoHideDuration={6000} 
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >

@@ -19,7 +19,7 @@ import {
   FormControl,
   InputLabel,
   Typography,
-  SelectChangeEvent
+  SelectChangeEvent,
 } from '@mui/material';
 import { Edit, Delete, Block, Search, Key } from '@mui/icons-material';
 import { ApiKey, ApiKeyFilter } from '../../types/systemSettings';
@@ -51,7 +51,7 @@ const ApiKeyTable: React.FC<ApiKeyTableProps> = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
 }) => {
   const [searchTerm, setSearchTerm] = useState(filter.searchTerm || '');
 
@@ -184,19 +184,23 @@ const ApiKeyTable: React.FC<ApiKeyTableProps> = ({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={7} align="center">Loading...</TableCell>
+                <TableCell colSpan={7} align="center">
+                  Loading...
+                </TableCell>
               </TableRow>
             ) : apiKeys.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} align="center">No API keys found</TableCell>
+                <TableCell colSpan={7} align="center">
+                  No API keys found
+                </TableCell>
               </TableRow>
             ) : (
-              apiKeys.map((apiKey) => (
+              apiKeys.map(apiKey => (
                 <TableRow key={apiKey.id} hover>
                   <TableCell>{apiKey.name}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={formatServiceName(apiKey.service)} 
+                    <Chip
+                      label={formatServiceName(apiKey.service)}
                       color={getServiceColor(apiKey.service)}
                       size="small"
                       variant="outlined"
@@ -213,16 +217,16 @@ const ApiKeyTable: React.FC<ApiKeyTableProps> = ({
                     {apiKey.expiresAt ? new Date(apiKey.expiresAt).toLocaleDateString() : 'Never'}
                   </TableCell>
                   <TableCell>
-                    <Chip 
-                      label={apiKey.status} 
+                    <Chip
+                      label={apiKey.status}
                       color={getStatusColor(apiKey.status)}
                       size="small"
                     />
                   </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Edit">
-                      <IconButton 
-                        onClick={() => onEdit(apiKey)} 
+                      <IconButton
+                        onClick={() => onEdit(apiKey)}
                         color="primary"
                         disabled={apiKey.status === 'revoked'}
                       >
@@ -230,8 +234,8 @@ const ApiKeyTable: React.FC<ApiKeyTableProps> = ({
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Revoke">
-                      <IconButton 
-                        onClick={() => onRevoke(apiKey)} 
+                      <IconButton
+                        onClick={() => onRevoke(apiKey)}
                         color="warning"
                         disabled={apiKey.status !== 'active'}
                       >

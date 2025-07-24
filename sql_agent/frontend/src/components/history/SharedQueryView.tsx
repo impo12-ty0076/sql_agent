@@ -17,7 +17,7 @@ import {
   TableHead,
   TableRow,
   TablePagination,
-  Snackbar
+  Snackbar,
 } from '@mui/material';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
@@ -46,11 +46,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
       style={{ height: 'calc(100% - 48px)', overflow: 'auto' }}
     >
-      {value === index && (
-        <Box sx={{ p: 2, height: '100%' }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 2, height: '100%' }}>{children}</Box>}
     </div>
   );
 }
@@ -98,15 +94,17 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
             expires_at?: string;
           };
         }>(`/api/query-history/shared/${shareId}?token=${token}`);
-        
+
         setQueryDetails(response.data.query_details);
         setShareDetails(response.data.share_details);
-        
+
         // Fetch query result if available
         if (response.data.query_details.result) {
           try {
             const resultResponse = await api.get<QueryResult>(
-              `/api/query-history/shared/${shareId}/result?token=${token}&page=${page + 1}&page_size=${rowsPerPage}`
+              `/api/query-history/shared/${shareId}/result?token=${token}&page=${
+                page + 1
+              }&page_size=${rowsPerPage}`
             );
             setQueryResult(resultResponse.data);
           } catch (resultErr) {
@@ -126,7 +124,7 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-  
+
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -135,20 +133,20 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  
+
   const handleCopySQL = () => {
     if (queryDetails?.generated_sql) {
       navigator.clipboard.writeText(queryDetails.generated_sql);
       showSnackbar('SQL이 클립보드에 복사되었습니다.');
     }
   };
-  
+
   const handleCloneQuery = async () => {
     if (!queryDetails) return;
-    
+
     try {
       await api.post('/api/query-history/clone', {
-        query_id: queryDetails.id
+        query_id: queryDetails.id,
       });
       showSnackbar('쿼리가 내 이력에 복제되었습니다.');
     } catch (err) {
@@ -156,16 +154,16 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
       showSnackbar('쿼리 복제에 실패했습니다.');
     }
   };
-  
+
   const handleDownloadResults = () => {
     if (!queryResult) return;
-    
+
     try {
       // Create CSV content
       const headers = queryResult.columns.map(col => col.name).join(',');
       const rows = queryResult.rows.map(row => row.join(',')).join('\n');
       const csvContent = `${headers}\n${rows}`;
-      
+
       // Create download link
       const blob = new Blob([csvContent], { type: 'text/csv' });
       const url = window.URL.createObjectURL(blob);
@@ -176,26 +174,28 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      
+
       showSnackbar('결과가 CSV 파일로 다운로드되었습니다.');
     } catch (err) {
       console.error('Failed to download results:', err);
       showSnackbar('결과 다운로드에 실패했습니다.');
     }
   };
-  
+
   const showSnackbar = (message: string) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
   };
-  
+
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
+      >
         <CircularProgress />
       </Box>
     );
@@ -203,7 +203,15 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
 
   if (error) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', p: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          p: 3,
+        }}
+      >
         <Alert severity="error" sx={{ width: '100%', maxWidth: 600 }}>
           {error}
         </Alert>
@@ -213,7 +221,15 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
 
   if (!queryDetails || !shareDetails) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', p: 3 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          p: 3,
+        }}
+      >
         <Alert severity="warning" sx={{ width: '100%', maxWidth: 600 }}>
           공유된 쿼리 정보를 찾을 수 없습니다.
         </Alert>
@@ -227,32 +243,40 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
         <Typography variant="h4" component="h1" gutterBottom>
           공유된 쿼리
         </Typography>
-        
+
         <Box sx={{ mb: 3 }}>
           <Typography variant="body2" color="text.secondary">
             공유자: {shareDetails.created_by}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            공유일: {format(new Date(shareDetails.created_at), 'yyyy년 MM월 dd일 HH:mm:ss', { locale: ko })}
+            공유일:{' '}
+            {format(new Date(shareDetails.created_at), 'yyyy년 MM월 dd일 HH:mm:ss', { locale: ko })}
           </Typography>
           {shareDetails.expires_at && (
             <Typography variant="body2" color="text.secondary">
-              만료일: {format(new Date(shareDetails.expires_at), 'yyyy년 MM월 dd일 HH:mm:ss', { locale: ko })}
+              만료일:{' '}
+              {format(new Date(shareDetails.expires_at), 'yyyy년 MM월 dd일 HH:mm:ss', {
+                locale: ko,
+              })}
             </Typography>
           )}
         </Box>
-        
+
         <Divider sx={{ mb: 3 }} />
-        
+
         <Box sx={{ height: 'calc(100vh - 300px)', display: 'flex', flexDirection: 'column' }}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="shared query tabs">
-              <Tab label="자연어 질의" id="shared-query-tab-0" aria-controls="shared-query-tabpanel-0" />
+              <Tab
+                label="자연어 질의"
+                id="shared-query-tab-0"
+                aria-controls="shared-query-tabpanel-0"
+              />
               <Tab label="SQL" id="shared-query-tab-1" aria-controls="shared-query-tabpanel-1" />
               <Tab label="결과" id="shared-query-tab-2" aria-controls="shared-query-tabpanel-2" />
             </Tabs>
           </Box>
-          
+
           <TabPanel value={tabValue} index={0}>
             {queryDetails.natural_language ? (
               <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
@@ -264,27 +288,23 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
               </Typography>
             )}
           </TabPanel>
-          
+
           <TabPanel value={tabValue} index={1}>
             {queryDetails.generated_sql ? (
               <Box>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-                  <Button 
-                    startIcon={<ContentCopyIcon />} 
-                    size="small" 
-                    onClick={handleCopySQL}
-                  >
+                  <Button startIcon={<ContentCopyIcon />} size="small" onClick={handleCopySQL}>
                     SQL 복사
                   </Button>
                 </Box>
-                <Paper 
-                  variant="outlined" 
-                  sx={{ 
-                    p: 2, 
-                    bgcolor: 'grey.100', 
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    bgcolor: 'grey.100',
                     fontFamily: 'monospace',
                     whiteSpace: 'pre-wrap',
-                    overflowX: 'auto'
+                    overflowX: 'auto',
                   }}
                 >
                   {queryDetails.generated_sql}
@@ -296,7 +316,7 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
               </Typography>
             )}
           </TabPanel>
-          
+
           <TabPanel value={tabValue} index={2}>
             {queryResult ? (
               <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -306,16 +326,16 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
                       {queryResult.summary}
                     </Typography>
                   )}
-                  <Button 
-                    startIcon={<DownloadIcon />} 
-                    size="small" 
-                    onClick={handleDownloadResults}
-                  >
+                  <Button startIcon={<DownloadIcon />} size="small" onClick={handleDownloadResults}>
                     CSV 다운로드
                   </Button>
                 </Box>
-                
-                <TableContainer component={Paper} variant="outlined" sx={{ flexGrow: 1, overflow: 'auto' }}>
+
+                <TableContainer
+                  component={Paper}
+                  variant="outlined"
+                  sx={{ flexGrow: 1, overflow: 'auto' }}
+                >
                   <Table stickyHeader size="small">
                     <TableHead>
                       <TableRow>
@@ -342,7 +362,7 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
                     </TableBody>
                   </Table>
                 </TableContainer>
-                
+
                 <TablePagination
                   rowsPerPageOptions={[10, 25, 50, 100]}
                   component="div"
@@ -361,22 +381,18 @@ const SharedQueryView: React.FC<SharedQueryViewProps> = ({ shareId, token }) => 
             )}
           </TabPanel>
         </Box>
-        
+
         <Box sx={{ mt: 3, display: 'flex', justifyContent: 'space-between' }}>
           <Button variant="outlined" onClick={() => window.history.back()}>
             뒤로 가기
           </Button>
-          
-          <Button 
-            variant="contained" 
-            color="primary"
-            onClick={handleCloneQuery}
-          >
+
+          <Button variant="contained" color="primary" onClick={handleCloneQuery}>
             내 쿼리로 복제
           </Button>
         </Box>
       </Paper>
-      
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

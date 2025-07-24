@@ -10,7 +10,7 @@ const mockApiKeys: ApiKey[] = [
     service: 'openai',
     lastFourDigits: '1234',
     createdAt: new Date('2023-01-01'),
-    status: 'active'
+    status: 'active',
   },
   {
     id: '2',
@@ -19,8 +19,8 @@ const mockApiKeys: ApiKey[] = [
     lastFourDigits: '5678',
     createdAt: new Date('2023-01-01'),
     expiresAt: new Date('2024-01-01'),
-    status: 'expired'
-  }
+    status: 'expired',
+  },
 ];
 
 const mockProps = {
@@ -35,25 +35,25 @@ const mockProps = {
   page: 0,
   rowsPerPage: 10,
   onPageChange: jest.fn(),
-  onRowsPerPageChange: jest.fn()
+  onRowsPerPageChange: jest.fn(),
 };
 
 describe('ApiKeyTable', () => {
   it('renders API key table with data', () => {
     render(<ApiKeyTable {...mockProps} />);
-    
+
     // Check if table headers are rendered
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Service')).toBeInTheDocument();
     expect(screen.getByText('Key')).toBeInTheDocument();
     expect(screen.getByText('Created')).toBeInTheDocument();
-    
+
     // Check if API key data is rendered
     expect(screen.getByText('OpenAI Key')).toBeInTheDocument();
     expect(screen.getByText('OpenAI')).toBeInTheDocument();
     expect(screen.getByText('Azure OpenAI Key')).toBeInTheDocument();
     expect(screen.getByText('Azure OpenAI')).toBeInTheDocument();
-    
+
     // Check if masked keys are displayed
     const maskedKeys = screen.getAllByText(/•••• •••• •••• \d{4}/);
     expect(maskedKeys.length).toBe(2);
@@ -94,10 +94,10 @@ describe('ApiKeyTable', () => {
     render(<ApiKeyTable {...mockProps} />);
     const searchInput = screen.getByLabelText('Search');
     fireEvent.change(searchInput, { target: { value: 'openai' } });
-    
+
     const searchButton = screen.getByLabelText('Search');
     fireEvent.click(searchButton);
-    
+
     expect(mockProps.onFilterChange).toHaveBeenCalledWith({ searchTerm: 'openai' });
   });
 
@@ -105,10 +105,10 @@ describe('ApiKeyTable', () => {
     render(<ApiKeyTable {...mockProps} />);
     const serviceSelect = screen.getByLabelText('Service');
     fireEvent.mouseDown(serviceSelect);
-    
+
     const openaiOption = screen.getByText('OpenAI');
     fireEvent.click(openaiOption);
-    
+
     expect(mockProps.onFilterChange).toHaveBeenCalledWith({ service: 'openai' });
   });
 });

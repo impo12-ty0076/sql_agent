@@ -1,22 +1,22 @@
 import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Chip, 
-  Paper, 
-  Tooltip, 
+import {
+  Box,
+  Typography,
+  Chip,
+  Paper,
+  Tooltip,
   IconButton,
   Collapse,
   List,
   ListItem,
-  ListItemText
+  ListItemText,
 } from '@mui/material';
-import { 
-  CheckCircle as CheckCircleIcon, 
-  Error as ErrorIcon, 
+import {
+  CheckCircle as CheckCircleIcon,
+  Error as ErrorIcon,
   Info as InfoIcon,
   ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon
+  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -46,31 +46,21 @@ const ConnectionStatus: React.FC = () => {
           <Typography variant="subtitle1" sx={{ mr: 2 }}>
             연결 상태:
           </Typography>
-          
+
           {selectedDatabase.connected ? (
-            <Chip
-              icon={<CheckCircleIcon />}
-              label="연결됨"
-              color="success"
-              size="small"
-            />
+            <Chip icon={<CheckCircleIcon />} label="연결됨" color="success" size="small" />
           ) : (
-            <Chip
-              icon={<ErrorIcon />}
-              label="연결 안됨"
-              color="error"
-              size="small"
-            />
+            <Chip icon={<ErrorIcon />} label="연결 안됨" color="error" size="small" />
           )}
         </Box>
-        
+
         <Tooltip title="연결 정보">
           <IconButton size="small" onClick={handleToggleExpand}>
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Tooltip>
       </Box>
-      
+
       <Collapse in={expanded}>
         <Box sx={{ mt: 2 }}>
           <Typography variant="body2">
@@ -85,7 +75,7 @@ const ConnectionStatus: React.FC = () => {
               {selectedDatabase.port && `:${selectedDatabase.port}`}
             </Typography>
           )}
-          
+
           {error && (
             <Box sx={{ mt: 1, p: 1, bgcolor: 'error.light', borderRadius: 1 }}>
               <Typography variant="body2" color="error.contrastText">
@@ -94,20 +84,20 @@ const ConnectionStatus: React.FC = () => {
               </Typography>
             </Box>
           )}
-          
+
           {selectedDatabase.connected && tables.length > 0 && (
             <Box sx={{ mt: 2 }}>
               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
                 <InfoIcon fontSize="small" sx={{ mr: 1 }} />
                 사용 가능한 테이블: {tables.length}개
               </Typography>
-              
+
               {tables.length > 0 && (
                 <List dense sx={{ maxHeight: 200, overflow: 'auto' }}>
                   {tables.slice(0, 5).map((table, index) => (
                     <ListItem key={index} sx={{ py: 0 }}>
-                      <ListItemText 
-                        primary={table.name} 
+                      <ListItemText
+                        primary={table.name}
                         secondary={`${table.columns.length}개 컬럼`}
                         primaryTypographyProps={{ variant: 'body2' }}
                         secondaryTypographyProps={{ variant: 'caption' }}
@@ -116,7 +106,7 @@ const ConnectionStatus: React.FC = () => {
                   ))}
                   {tables.length > 5 && (
                     <ListItem sx={{ py: 0 }}>
-                      <ListItemText 
+                      <ListItemText
                         primary={`...외 ${tables.length - 5}개 테이블`}
                         primaryTypographyProps={{ variant: 'caption', color: 'text.secondary' }}
                       />

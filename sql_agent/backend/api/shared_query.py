@@ -12,7 +12,7 @@ from ..services.query_execution_service import QueryExecutionService
 from ..core.auth import get_current_user, get_current_user_id
 
 router = APIRouter(
-    prefix="/api/shared-query",
+    prefix="/shared-query",
     tags=["shared-query"],
     responses={401: {"description": "Unauthorized"}},
 )

@@ -43,18 +43,18 @@ export const formatDuration = (ms: number): string => {
   if (ms < 1000) {
     return `${ms}ms`;
   }
-  
+
   const seconds = Math.floor(ms / 1000);
   if (seconds < 60) {
     return `${seconds}s`;
   }
-  
+
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
   if (minutes < 60) {
     return `${minutes}m ${remainingSeconds}s`;
   }
-  
+
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
@@ -72,9 +72,7 @@ export const truncateString = (str: string, maxLength: number): string => {
  * Convert a camelCase string to Title Case
  */
 export const camelToTitleCase = (camelCase: string): string => {
-  return camelCase
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, (str) => str.toUpperCase());
+  return camelCase.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
 };
 
 /**
@@ -90,6 +88,9 @@ export const formatSqlQuery = (sql: string): string => {
     .replace(/\s*;\s*/g, ';\n')
     .replace(/\s*(\()\s*/g, ' $1')
     .replace(/\s*(\))\s*/g, '$1 ')
-    .replace(/\b(SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\b/gi, '\n$1')
+    .replace(
+      /\b(SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|TRUNCATE)\b/gi,
+      '\n$1'
+    )
     .replace(/\b(INNER|LEFT|RIGHT|OUTER|CROSS|JOIN|ON|AND|OR)\b/gi, '\n  $1');
 };

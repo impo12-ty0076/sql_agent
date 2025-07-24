@@ -47,7 +47,7 @@ class SystemLogResponse(BaseModel):
     details: Optional[Dict[str, Any]] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SystemMetricCreate(BaseModel):
@@ -66,7 +66,7 @@ class SystemMetricResponse(BaseModel):
     details: Optional[Dict[str, Any]] = None
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SystemStatsResponse(BaseModel):

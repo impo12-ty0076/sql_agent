@@ -1,11 +1,11 @@
 import { AppDispatch } from '../store';
-import { 
-  executeQueryStart, 
-  executeQuerySuccess, 
+import {
+  executeQueryStart,
+  executeQuerySuccess,
   executeQueryFailure,
   setCurrentQuery,
   setGeneratedSql,
-  setUseRag
+  setUseRag,
 } from '../store/slices/querySlice';
 import { queryAPI } from './api';
 
@@ -27,59 +27,59 @@ export interface SqlExecutionResult {
 }
 
 export const queryService = {
-  processNaturalLanguage: (dbId: string, query: string, useRag: boolean = false) => 
+  processNaturalLanguage:
+    (dbId: string, query: string, useRag = false) =>
     async (dispatch: AppDispatch) => {
       dispatch(executeQueryStart());
       dispatch(setCurrentQuery(query));
       dispatch(setUseRag(useRag));
-      
+
       try {
         const response = await queryAPI.processNaturalLanguage(dbId, query, useRag);
         const result = response.data as NaturalLanguageQueryResult;
         dispatch(setGeneratedSql(result.generatedSql));
         return result;
       } catch (error: any) {
-        dispatch(executeQueryFailure(error.response?.data?.message || '자연어 처리 중 오류가 발생했습니다.'));
+        dispatch(
+          executeQueryFailure(
+            error.response?.data?.message || '자연어 처리 중 오류가 발생했습니다.'
+          )
+        );
         throw error;
       }
     },
-    
-  executeQuery: (dbId: string, sql: string) => 
-    async (dispatch: AppDispatch) => {
-      dispatch(executeQueryStart());
-      
-      try {
-        const response = await queryAPI.executeQuery(dbId, sql);
-        const result = response.data as SqlExecutionResult;
-        dispatch(executeQuerySuccess({
+
+  executeQuery: (dbId: string, sql: string) => async (dispatch: AppDispatch) => {
+    dispatch(executeQueryStart());
+
+    try {
+      const response = await queryAPI.executeQuery(dbId, sql);
+      const result = response.data as SqlExecutionResult;
+      dispatch(
+        executeQuerySuccess({
           columns: result.columns.map(col => col.name),
           rows: result.rows,
           rowCount: result.rowCount,
           executionTime: result.executionTime,
-          resultId: result.resultId
-        }));
-        return result;
-      } catch (error: any) {
-        dispatch(executeQueryFailure(error.response?.data?.message || 'SQL 실행 중 오류가 발생했습니다.'));
-        throw error;
-      }
-    },
-    
-  getQueryStatus: async (queryId: string) => {
-    try {
-      const response = await queryAPI.getQueryStatus(queryId);
-      return response.data;
-    } catch (error) {
+          resultId: result.resultId,
+        })
+      );
+      return result;
+    } catch (error: any) {
+      dispatch(
+        executeQueryFailure(error.response?.data?.message || 'SQL 실행 중 오류가 발생했습니다.')
+      );
       throw error;
     }
   },
-  
+
+  getQueryStatus: async (queryId: string) => {
+    const response = await queryAPI.getQueryStatus(queryId);
+    return response.data;
+  },
+
   cancelQuery: async (queryId: string) => {
-    try {
-      const response = await queryAPI.cancelQuery(queryId);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  }
+    const response = await queryAPI.cancelQuery(queryId);
+    return response.data;
+  },
 };

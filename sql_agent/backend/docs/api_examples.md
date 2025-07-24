@@ -27,9 +27,9 @@ def login(username, password):
         "username": username,
         "password": password
     }
-    
+
     response = requests.post(url, data=data)
-    
+
     if response.status_code == 200:
         token_data = response.json()
         return token_data["access_token"]
@@ -59,9 +59,9 @@ def get_current_user(access_token):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -78,7 +78,7 @@ if user_info:
 
 ### 로그아웃
 
-```python
+````python
 import requests
 
 def logout(access_token):
@@ -87,9 +87,9 @@ def logout(access_token):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.post(url, headers=headers)
-    
+
     if response.status_code == 200:
         return True
     else:
@@ -99,7 +99,7 @@ def logout(access_token):
 # 사용 예제
 if logout(access_token):
     print("로그아웃 성공!")
-```## 
+```##
 2. 데이터베이스 연결
 
 ### 데이터베이스 목록 조회
@@ -113,9 +113,9 @@ def get_databases(access_token):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()["databases"]
     else:
@@ -128,7 +128,7 @@ if databases:
     print(f"사용 가능한 데이터베이스: {len(databases)}개")
     for db in databases:
         print(f"- {db['name']} ({db['type']}): {db['host']}:{db['port']}")
-```
+````
 
 ### 데이터베이스 연결
 
@@ -145,9 +145,9 @@ def connect_database(access_token, db_id):
     data = {
         "db_id": db_id
     }
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -167,7 +167,7 @@ if connection:
 
 ### 데이터베이스 스키마 조회
 
-```python
+````python
 import requests
 
 def get_database_schema(access_token, db_id=None):
@@ -179,9 +179,9 @@ def get_database_schema(access_token, db_id=None):
     params = {}
     if db_id:
         params["db_id"] = db_id
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -193,12 +193,12 @@ schema = get_database_schema(access_token)
 if schema:
     print(f"데이터베이스: {schema['db_id']}")
     print(f"스키마 수: {len(schema['schemas'])}")
-    
+
     # 테이블 정보 출력
     for s in schema['schemas']:
         print(f"\n스키마: {s['name']}")
         print(f"테이블 수: {len(s['tables'])}")
-        
+
         for table in s['tables'][:3]:  # 처음 3개 테이블만 출력
             print(f"  - {table['name']} (컬럼 수: {len(table['columns'])})")
             for column in table['columns'][:3]:  # 처음 3개 컬럼만 출력
@@ -224,9 +224,9 @@ def natural_language_to_sql(access_token, query, db_id=None, use_rag=False):
     }
     if db_id:
         data["db_id"] = db_id
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -240,7 +240,7 @@ def natural_language_to_sql(access_token, query, db_id=None, use_rag=False):
 
 # 사용 예제
 query_result = natural_language_to_sql(
-    access_token, 
+    access_token,
     "지난 달 판매량이 가장 높은 상위 5개 제품은?",
     db_id="mssql-prod-01"
 )
@@ -251,11 +251,11 @@ if query_result:
     print(query_result["generated_sql"])
     print("\n설명:", query_result["explanation"])
     print("\n사용된 테이블:", ", ".join(query_result["tables_used"]))
-```
+````
 
 ### RAG 시스템을 사용한 질의
 
-```python
+````python
 import requests
 
 def rag_query(access_token, query, db_id=None):
@@ -271,9 +271,9 @@ def rag_query(access_token, query, db_id=None):
     }
     if db_id:
         data["db_id"] = db_id
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -282,7 +282,7 @@ def rag_query(access_token, query, db_id=None):
 
 # 사용 예제
 rag_result = rag_query(
-    access_token, 
+    access_token,
     "판매 데이터의 구조와 주요 테이블을 설명해주세요.",
     db_id="mssql-prod-01"
 )
@@ -316,9 +316,9 @@ def execute_sql_query(access_token, sql, query_id=None, db_id=None, timeout=30):
         data["query_id"] = query_id
     if db_id:
         data["db_id"] = db_id
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -336,28 +336,28 @@ def execute_sql_query(access_token, sql, query_id=None, db_id=None, timeout=30):
 if query_result:
     sql = query_result["generated_sql"]
     query_id = query_result["query_id"]
-    
+
     execution_result = execute_sql_query(
-        access_token, 
-        sql, 
+        access_token,
+        sql,
         query_id=query_id,
         timeout=60
     )
-    
+
     if execution_result:
         print(f"쿼리 실행 완료 (실행 시간: {execution_result['execution_time']}초)")
         print(f"결과 행 수: {execution_result['row_count']}")
-        
+
         # 결과 컬럼 출력
         print("\n컬럼:")
         for col in execution_result['columns']:
             print(f"- {col['name']} ({col['type']})")
-        
+
         # 결과 데이터 출력 (최대 5행)
         print("\n데이터:")
         for row in execution_result['rows'][:5]:
             print(row)
-```
+````
 
 ### 쿼리 상태 확인
 
@@ -371,9 +371,9 @@ def check_query_status(access_token, query_id):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -395,29 +395,29 @@ def execute_long_query(access_token, sql, db_id=None):
     }
     if db_id:
         data["db_id"] = db_id
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code != 200:
         print(f"쿼리 실행 요청 실패: {response.status_code}")
         return None
-    
+
     result = response.json()
     query_id = result["query_id"]
-    
+
     # 쿼리가 즉시 완료된 경우
     if result["status"] == "completed":
         return result
-    
+
     # 쿼리 상태 모니터링
     print("쿼리 실행 중...")
     while True:
         status = check_query_status(access_token, query_id)
-        
+
         if not status:
             print("상태 확인 실패")
             break
-        
+
         if status["status"] in ["completed", "failed", "cancelled"]:
             # 쿼리 완료, 결과 조회
             if status["status"] == "completed":
@@ -425,10 +425,10 @@ def execute_long_query(access_token, sql, db_id=None):
                 result_response = requests.get(result_url, headers=headers)
                 if result_response.status_code == 200:
                     return result_response.json()
-            
+
             # 쿼리 실패 또는 취소
             return status
-        
+
         # 진행 상황 출력
         print(f"진행률: {status.get('progress', '?')}%, 경과 시간: {status.get('elapsed_time', '?')}초")
         time.sleep(2)  # 2초마다 상태 확인
@@ -453,7 +453,7 @@ if result:
 
 ### 쿼리 취소
 
-```python
+````python
 import requests
 
 def cancel_query(access_token, query_id):
@@ -462,9 +462,9 @@ def cancel_query(access_token, query_id):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.post(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -494,9 +494,9 @@ def get_query_result(access_token, result_id, page=1, page_size=100):
         "page": page,
         "page_size": page_size
     }
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -506,19 +506,19 @@ def get_query_result(access_token, result_id, page=1, page_size=100):
 # 사용 예제
 if execution_result and "result_id" in execution_result:
     result_id = execution_result["result_id"]
-    
+
     # 첫 페이지 조회
     result_page1 = get_query_result(access_token, result_id, page=1, page_size=10)
-    
+
     if result_page1:
         print(f"총 행 수: {result_page1['total_row_count']}")
         print(f"총 페이지 수: {result_page1['total_pages']}")
-        
+
         # 결과 데이터 출력
         print("\n결과 데이터 (페이지 1):")
         for row in result_page1['rows']:
             print(row)
-        
+
         # 두 번째 페이지가 있으면 조회
         if result_page1['total_pages'] > 1:
             result_page2 = get_query_result(access_token, result_id, page=2, page_size=10)
@@ -526,7 +526,7 @@ if execution_result and "result_id" in execution_result:
                 print("\n결과 데이터 (페이지 2):")
                 for row in result_page2['rows']:
                     print(row)
-```
+````
 
 ### 결과 요약 생성
 
@@ -543,9 +543,9 @@ def generate_result_summary(access_token, result_id, detail_level="medium"):
     data = {
         "detail_level": detail_level  # "low", "medium", "high" 중 하나
     }
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -555,13 +555,13 @@ def generate_result_summary(access_token, result_id, detail_level="medium"):
 # 사용 예제
 if execution_result and "result_id" in execution_result:
     result_id = execution_result["result_id"]
-    
+
     summary = generate_result_summary(access_token, result_id, detail_level="high")
-    
+
     if summary:
         print("\n결과 요약:")
         print(summary["summary"])
-        
+
         print("\n주요 인사이트:")
         for insight in summary["insights"]:
             print(f"- {insight}")
@@ -569,7 +569,7 @@ if execution_result and "result_id" in execution_result:
 
 ### 리포트 생성 및 조회
 
-```python
+````python
 import requests
 import time
 
@@ -586,9 +586,9 @@ def generate_report(access_token, result_id, report_type="standard", visualizati
     }
     if visualizations:
         data["visualizations"] = visualizations
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 202:
         return response.json()
     else:
@@ -601,9 +601,9 @@ def check_report_status(access_token, report_id):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -616,9 +616,9 @@ def get_report(access_token, report_id):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -628,66 +628,66 @@ def get_report(access_token, report_id):
 # 사용 예제
 if execution_result and "result_id" in execution_result:
     result_id = execution_result["result_id"]
-    
+
     # 리포트 생성 요청
     report_request = generate_report(
-        access_token, 
-        result_id, 
-        report_type="comprehensive", 
+        access_token,
+        result_id,
+        report_type="comprehensive",
         visualizations=["bar", "pie", "line"],
         include_code=True
     )
-    
+
     if report_request:
         report_id = report_request["report_id"]
         print(f"리포트 생성 요청 완료 (ID: {report_id})")
         print(f"예상 완료 시간: {report_request['estimated_completion_time']}")
-        
+
         # 리포트 생성 상태 확인
         while True:
             status = check_report_status(access_token, report_id)
-            
+
             if not status:
                 print("상태 확인 실패")
                 break
-            
+
             print(f"상태: {status['status']}, 진행률: {status['progress']}%")
-            
+
             if status["status"] == "completed":
                 # 리포트 조회
                 report = get_report(access_token, report_id)
-                
+
                 if report:
                     print("\n리포트 생성 완료!")
                     print(f"제목: {report['title']}")
                     print(f"요약: {report['summary']}")
-                    
+
                     print("\n인사이트:")
                     for insight in report["insights"]:
                         print(f"- {insight}")
-                    
+
                     print(f"\n시각화: {len(report['visualizations'])}개")
                     for viz in report["visualizations"]:
                         print(f"- {viz['type']}: {viz['title']}")
-                    
+
                     # 리포트 다운로드
                     download_url = f"http://localhost:8000/api/report/{report_id}/download?format=pdf"
                     download_response = requests.get(
-                        download_url, 
+                        download_url,
                         headers={"Authorization": f"Bearer {access_token}"}
                     )
-                    
+
                     if download_response.status_code == 200:
                         with open("report.pdf", "wb") as f:
                             f.write(download_response.content)
                         print("\nPDF 리포트가 'report.pdf'로 저장되었습니다.")
-                
+
                 break
-            
+
             elif status["status"] == "failed":
                 print(f"리포트 생성 실패: {status.get('message', '알 수 없는 오류')}")
                 break
-            
+
             time.sleep(2)  # 2초마다 상태 확인
 ```## 6. 이
 력 관리 및 공유
@@ -709,18 +709,18 @@ def get_query_history(access_token, page=1, page_size=20, sort_by="created_at", 
         "sort_by": sort_by,
         "sort_order": sort_order
     }
-    
+
     if filter_favorite:
         params["filter_favorite"] = "true"
-    
+
     if filter_tag:
         params["filter_tag"] = filter_tag
-    
+
     if search:
         params["search"] = search
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -729,10 +729,10 @@ def get_query_history(access_token, page=1, page_size=20, sort_by="created_at", 
 
 # 사용 예제
 history = get_query_history(
-    access_token, 
-    page=1, 
-    page_size=10, 
-    sort_by="created_at", 
+    access_token,
+    page=1,
+    page_size=10,
+    sort_by="created_at",
     sort_order="desc",
     filter_favorite=True
 )
@@ -740,7 +740,7 @@ history = get_query_history(
 if history:
     print(f"총 이력 수: {history['total_count']}")
     print(f"페이지: {history['page']}/{history['total_pages']}")
-    
+
     print("\n쿼리 이력:")
     for item in history["history"]:
         print(f"- ID: {item['id']}")
@@ -750,7 +750,7 @@ if history:
         print(f"  생성 시간: {item['created_at']}")
         print(f"  태그: {', '.join(item['tags'])}")
         print()
-```
+````
 
 ### 쿼리 이력 즐겨찾기 및 태그 관리
 
@@ -767,9 +767,9 @@ def update_favorite(access_token, history_id, favorite):
     data = {
         "favorite": favorite
     }
-    
+
     response = requests.put(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -786,9 +786,9 @@ def update_tags(access_token, history_id, tags):
     data = {
         "tags": tags
     }
-    
+
     response = requests.put(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -805,9 +805,9 @@ def update_notes(access_token, history_id, notes):
     data = {
         "notes": notes
     }
-    
+
     response = requests.put(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -817,18 +817,18 @@ def update_notes(access_token, history_id, notes):
 # 사용 예제
 if history and history["history"]:
     history_id = history["history"][0]["id"]
-    
+
     # 즐겨찾기 설정
     favorite_result = update_favorite(access_token, history_id, True)
     if favorite_result:
         print(f"즐겨찾기 설정 완료: {favorite_result['message']}")
-    
+
     # 태그 업데이트
     tags_result = update_tags(access_token, history_id, ["monthly-report", "sales", "important"])
     if tags_result:
         print(f"태그 업데이트 완료: {tags_result['message']}")
         print(f"새 태그: {', '.join(tags_result['tags'])}")
-    
+
     # 노트 업데이트
     notes_result = update_notes(access_token, history_id, "월간 판매 보고서용 쿼리 - 경영진 회의 자료로 사용")
     if notes_result:
@@ -852,9 +852,9 @@ def rerun_query(access_token, history_id, use_original_sql=True, db_id=None):
     }
     if db_id:
         data["db_id"] = db_id
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -864,7 +864,7 @@ def rerun_query(access_token, history_id, use_original_sql=True, db_id=None):
 # 사용 예제
 if history and history["history"]:
     history_id = history["history"][0]["id"]
-    
+
     rerun_result = rerun_query(access_token, history_id)
     if rerun_result:
         print(f"쿼리 재실행 요청 완료: {rerun_result['message']}")
@@ -874,7 +874,7 @@ if history and history["history"]:
 
 ### 쿼리 공유
 
-```python
+````python
 import requests
 
 def create_share_link(access_token, history_id, expires_in=7, allowed_users=None, include_result=True, include_report=False):
@@ -892,9 +892,9 @@ def create_share_link(access_token, history_id, expires_in=7, allowed_users=None
     }
     if allowed_users:
         data["allowed_users"] = allowed_users
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -907,9 +907,9 @@ def get_share_links(access_token):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -922,9 +922,9 @@ def delete_share_link(access_token, share_id):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.delete(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -934,22 +934,22 @@ def delete_share_link(access_token, share_id):
 # 사용 예제
 if history and history["history"]:
     history_id = history["history"][0]["id"]
-    
+
     # 공유 링크 생성
     share_result = create_share_link(
-        access_token, 
-        history_id, 
+        access_token,
+        history_id,
         expires_in=14,
         allowed_users=["colleague@example.com"],
         include_result=True,
         include_report=True
     )
-    
+
     if share_result:
         print(f"공유 링크 생성 완료!")
         print(f"공유 URL: {share_result['share_url']}")
         print(f"만료 시간: {share_result['expires_at']}")
-        
+
         # 공유 링크 목록 조회
         shares = get_share_links(access_token)
         if shares:
@@ -961,7 +961,7 @@ if history and history["history"]:
                 print(f"  만료 시간: {share['expires_at']}")
                 print(f"  접근 횟수: {share['access_count']}")
                 print()
-        
+
         # 공유 링크 삭제
         delete_result = delete_share_link(access_token, share_result['share_id'])
         if delete_result:
@@ -981,15 +981,15 @@ def handle_api_error(response):
         error_code = error_data.get("code", "UNKNOWN_ERROR")
         error_message = error_data.get("message", "알 수 없는 오류가 발생했습니다.")
         suggestions = error_data.get("suggestions", [])
-        
+
         print(f"오류 코드: {error_code}")
         print(f"오류 메시지: {error_message}")
-        
+
         if suggestions:
             print("제안 사항:")
             for suggestion in suggestions:
                 print(f"- {suggestion}")
-        
+
         return error_data
     except ValueError:
         print(f"오류 응답 파싱 실패: {response.text}")
@@ -1000,13 +1000,13 @@ def safe_api_call(func, *args, **kwargs):
     """안전한 API 호출 래퍼"""
     try:
         response = func(*args, **kwargs)
-        
+
         if response.status_code >= 400:
             error_data = handle_api_error(response)
             return {"success": False, "error": error_data}
-        
+
         return {"success": True, "data": response.json()}
-    
+
     except requests.RequestException as e:
         print(f"API 요청 실패: {e}")
         return {"success": False, "error": {"code": "REQUEST_ERROR", "message": str(e)}}
@@ -1022,7 +1022,7 @@ def execute_query(access_token, sql, db_id=None):
         "sql": sql,
         "db_id": db_id
     }
-    
+
     return requests.post(url, headers=headers, json=data)
 
 # 안전한 API 호출 사용
@@ -1039,13 +1039,13 @@ if result["success"]:
 else:
     error = result["error"]
     print(f"쿼리 실행 실패: {error['message']}")
-    
+
     # 특정 오류 코드에 따른 처리
     if error["code"] == "QUERY_SYNTAX_ERROR":
         print("SQL 구문을 확인하세요.")
     elif error["code"] == "DB_TABLE_NOT_FOUND":
         print("테이블 이름을 확인하세요.")
-```
+````
 
 ### 재시도 로직
 
@@ -1057,24 +1057,24 @@ def api_call_with_retry(func, max_retries=3, retry_delay=2, retryable_codes=None
     """재시도 로직이 포함된 API 호출 함수"""
     if retryable_codes is None:
         retryable_codes = [
-            "DB_CONNECTION_ERROR", 
-            "DB_TIMEOUT", 
-            "QUERY_TIMEOUT", 
+            "DB_CONNECTION_ERROR",
+            "DB_TIMEOUT",
+            "QUERY_TIMEOUT",
             "LLM_SERVICE_ERROR",
             "SYSTEM_OVERLOADED"
         ]
-    
+
     retries = 0
     while retries < max_retries:
         try:
             response = func(*args, **kwargs)
-            
+
             if response.status_code == 200:
                 return {"success": True, "data": response.json()}
-            
+
             error_data = response.json()
             error_code = error_data.get("code", "UNKNOWN_ERROR")
-            
+
             # 재시도 가능한 오류인 경우
             if error_data.get("retryable", False) or error_code in retryable_codes:
                 retries += 1
@@ -1082,16 +1082,16 @@ def api_call_with_retry(func, max_retries=3, retry_delay=2, retryable_codes=None
                 print(f"재시도 가능한 오류 발생: {error_code}. {wait_time}초 후 재시도 ({retries}/{max_retries})...")
                 time.sleep(wait_time)
                 continue
-            
+
             # 재시도할 수 없는 오류
             return {"success": False, "error": error_data}
-            
+
         except requests.RequestException as e:
             retries += 1
             wait_time = retry_delay * (2 ** (retries - 1))
             print(f"요청 실패: {e}. {wait_time}초 후 재시도 ({retries}/{max_retries})...")
             time.sleep(wait_time)
-    
+
     return {"success": False, "error": {"code": "MAX_RETRIES_EXCEEDED", "message": "최대 재시도 횟수를 초과했습니다."}}
 
 # 사용 예제
@@ -1113,7 +1113,7 @@ else:
 
 ### 오류 로깅
 
-```python
+````python
 import logging
 import requests
 import json
@@ -1132,7 +1132,7 @@ def log_api_call(request_method, url, headers, data=None, params=None, response=
     safe_headers = headers.copy() if headers else {}
     if "Authorization" in safe_headers:
         safe_headers["Authorization"] = "Bearer [REDACTED]"
-    
+
     log_data = {
         "request": {
             "method": request_method,
@@ -1140,33 +1140,33 @@ def log_api_call(request_method, url, headers, data=None, params=None, response=
             "headers": safe_headers
         }
     }
-    
+
     if data:
         # 민감 정보가 있을 수 있는 필드 마스킹
         safe_data = data.copy() if isinstance(data, dict) else data
         if isinstance(safe_data, dict) and "password" in safe_data:
             safe_data["password"] = "[REDACTED]"
         log_data["request"]["data"] = safe_data
-    
+
     if params:
         log_data["request"]["params"] = params
-    
+
     if response:
         log_data["response"] = {
             "status_code": response.status_code,
             "content_type": response.headers.get("Content-Type")
         }
-        
+
         # 응답 본문이 JSON인 경우만 로깅
         if "application/json" in response.headers.get("Content-Type", ""):
             try:
                 log_data["response"]["body"] = response.json()
             except ValueError:
                 log_data["response"]["body"] = "[PARSE_ERROR]"
-    
+
     if error:
         log_data["error"] = str(error)
-    
+
     # 로그 레벨 결정
     if error or (response and response.status_code >= 500):
         logger.error(json.dumps(log_data))
@@ -1187,7 +1187,7 @@ def logged_api_call(method, url, headers=None, data=None, params=None, json_data
             params=params,
             json=json_data
         )
-        
+
         log_api_call(
             request_method=method,
             url=url,
@@ -1196,9 +1196,9 @@ def logged_api_call(method, url, headers=None, data=None, params=None, json_data
             params=params,
             response=response
         )
-        
+
         return response
-    
+
     except requests.RequestException as e:
         log_api_call(
             request_method=method,
@@ -1224,7 +1224,7 @@ try:
             "db_id": "mssql-prod-01"
         }
     )
-    
+
     if response.status_code == 200:
         result = response.json()
         print("쿼리 실행 성공!")
@@ -1236,7 +1236,7 @@ try:
             print(f"오류: {error_data.get('message', '알 수 없는 오류')}")
         except:
             print(f"응답: {response.text}")
-            
+
 except requests.RequestException as e:
     print(f"API 요청 실패: {e}")
 ```##
@@ -1259,12 +1259,12 @@ def get_users(access_token, page=1, page_size=20, sort_by="username", sort_order
         "sort_by": sort_by,
         "sort_order": sort_order
     }
-    
+
     if search:
         params["search"] = search
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1277,9 +1277,9 @@ def get_user_details(access_token, user_id):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1299,12 +1299,12 @@ def create_user(access_token, username, email, password, role="user", permission
         "password": password,
         "role": role
     }
-    
+
     if permissions:
         data["permissions"] = permissions
-    
+
     response = requests.post(url, headers=headers, json=data)
-    
+
     if response.status_code == 201:
         return response.json()
     else:
@@ -1319,21 +1319,21 @@ def update_user(access_token, user_id, email=None, role=None, status=None, permi
         "Content-Type": "application/json"
     }
     data = {}
-    
+
     if email:
         data["email"] = email
-    
+
     if role:
         data["role"] = role
-    
+
     if status:
         data["status"] = status
-    
+
     if permissions:
         data["permissions"] = permissions
-    
+
     response = requests.put(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1350,7 +1350,7 @@ if admin_token:
     if users:
         print(f"총 사용자 수: {users['total_count']}")
         print(f"페이지: {users['page']}/{users['total_pages']}")
-        
+
         print("\n사용자 목록:")
         for user in users["users"]:
             print(f"- ID: {user['id']}")
@@ -1359,7 +1359,7 @@ if admin_token:
             print(f"  역할: {user['role']}")
             print(f"  상태: {user['status']}")
             print()
-    
+
     # 새 사용자 생성
     new_user = create_user(
         admin_token,
@@ -1377,10 +1377,10 @@ if admin_token:
             ]
         }
     )
-    
+
     if new_user:
         print(f"새 사용자 생성 완료: {new_user['username']} (ID: {new_user['id']})")
-        
+
         # 사용자 정보 업데이트
         update_result = update_user(
             admin_token,
@@ -1388,10 +1388,10 @@ if admin_token:
             email="updated@example.com",
             role="admin"
         )
-        
+
         if update_result:
             print(f"사용자 정보 업데이트 완료: {update_result['message']}")
-```
+````
 
 ### 정책 관리
 
@@ -1404,9 +1404,9 @@ def get_policies(access_token):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1421,18 +1421,18 @@ def update_policy(access_token, policy_id, name=None, description=None, settings
         "Content-Type": "application/json"
     }
     data = {}
-    
+
     if name:
         data["name"] = name
-    
+
     if description:
         data["description"] = description
-    
+
     if settings:
         data["settings"] = settings
-    
+
     response = requests.put(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1453,7 +1453,7 @@ if admin_token:
             for key, value in policy["settings"].items():
                 print(f"    - {key}: {value}")
             print()
-    
+
     # 정책 업데이트
     policy_update = update_policy(
         admin_token,
@@ -1468,7 +1468,7 @@ if admin_token:
             "blocked_keywords": ["DROP", "DELETE", "UPDATE", "INSERT", "TRUNCATE"]
         }
     )
-    
+
     if policy_update:
         print(f"정책 업데이트 완료: {policy_update['message']}")
 ```
@@ -1488,9 +1488,9 @@ def get_system_statistics(access_token, period="last_30_days", group_by="day"):
         "period": period,
         "group_by": group_by
     }
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1507,27 +1507,27 @@ def get_system_logs(access_token, page=1, page_size=100, level=None, category=No
         "page": page,
         "page_size": page_size
     }
-    
+
     if level:
         params["level"] = level
-    
+
     if category:
         params["category"] = category
-    
+
     if start_date:
         params["start_date"] = start_date
-    
+
     if end_date:
         params["end_date"] = end_date
-    
+
     if user_id:
         params["user_id"] = user_id
-    
+
     if search:
         params["search"] = search
-    
+
     response = requests.get(url, headers=headers, params=params)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1546,15 +1546,15 @@ if admin_token:
         print(f"활성 사용자 수: {stats['active_users']}")
         print(f"평균 쿼리 시간: {stats['average_query_time']}초")
         print(f"쿼리 성공률: {stats['query_success_rate']}%")
-        
+
         print("\n상위 사용자:")
         for user in stats["top_users"][:3]:
             print(f"- {user['username']}: {user['query_count']}회")
-        
+
         print("\n상위 데이터베이스:")
         for db in stats["top_databases"][:3]:
             print(f"- {db['db_name']}: {db['query_count']}회")
-    
+
     # 시스템 로그 조회
     logs = get_system_logs(
         admin_token,
@@ -1564,7 +1564,7 @@ if admin_token:
         category="query",
         start_date="2023-01-01T00:00:00Z"
     )
-    
+
     if logs:
         print(f"\n시스템 로그 (총 {logs['total_count']}개):")
         for log in logs["logs"]:
@@ -1587,9 +1587,9 @@ def get_system_settings(access_token):
     headers = {
         "Authorization": f"Bearer {access_token}"
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1606,9 +1606,9 @@ def update_system_settings(access_token, settings):
     data = {
         "settings": settings
     }
-    
+
     response = requests.put(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -1626,7 +1626,7 @@ if admin_token:
         print(f"세션 타임아웃: {settings['settings']['security']['session_timeout']}초")
         print(f"LLM 제공자: {settings['settings']['llm']['provider']}")
         print(f"LLM 모델: {settings['settings']['llm']['model']}")
-    
+
     # 시스템 설정 업데이트
     update_result = update_system_settings(
         admin_token,
@@ -1645,7 +1645,7 @@ if admin_token:
             }
         }
     )
-    
+
     if update_result:
         print(f"시스템 설정 업데이트 완료: {update_result['message']}")
 ```

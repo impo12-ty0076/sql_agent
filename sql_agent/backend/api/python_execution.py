@@ -14,7 +14,7 @@ from ..services.python_interpreter import (
 )
 
 
-router = APIRouter(prefix="/api/python", tags=["python-execution"])
+router = APIRouter(prefix="/python", tags=["python-execution"])
 
 
 class ExecuteCodeRequest(BaseModel):

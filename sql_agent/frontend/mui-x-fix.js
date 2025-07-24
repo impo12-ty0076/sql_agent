@@ -6,10 +6,7 @@ const glob = require('glob');
 // Function to add .js extension to import statements
 function addJsExtension(content) {
   // Replace imports from @mui packages without extensions
-  return content.replace(
-    /from ['"](@mui\/[^/'"]+\/[^/'"]+)['"];/g, 
-    'from "$1.js";'
-  );
+  return content.replace(/from ['"](@mui\/[^/'"]+\/[^/'"]+)['"];/g, 'from "$1.js";');
 }
 
 // Find all JS files in the node_modules/@mui/x-date-pickers directory
@@ -22,7 +19,7 @@ muiFiles.forEach(file => {
   try {
     const content = fs.readFileSync(file, 'utf8');
     const newContent = addJsExtension(content);
-    
+
     // Only write if content changed
     if (content !== newContent) {
       fs.writeFileSync(file, newContent);

@@ -14,6 +14,7 @@ matplotlib>=3.7.1
 plotly>=5.14.1
 python-jose>=3.3.0
 passlib>=1.7.4
+bcrypt==4.0.1
 python-multipart>=0.0.6
 faiss-cpu>=1.7.4
 tiktoken>=0.4.0
@@ -33,3 +34,6 @@ flake8>=6.0.0
 # JavaScript/TypeScript 라이브러리 (프론트엔드용, 실제로는 npm으로 설치해야 함)
 # axios
 # react
+
+aiosqlite
+email-validator

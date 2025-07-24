@@ -23,7 +23,7 @@ describe('HistoryList', () => {
       tags: ['중요', '매출'],
       notes: '중요한 매출 쿼리',
       created_at: '2025-07-01T10:00:00Z',
-      updated_at: '2025-07-01T10:00:00Z'
+      updated_at: '2025-07-01T10:00:00Z',
     },
     {
       id: '2',
@@ -33,17 +33,17 @@ describe('HistoryList', () => {
       tags: ['고객'],
       notes: '',
       created_at: '2025-07-02T11:00:00Z',
-      updated_at: '2025-07-02T11:00:00Z'
-    }
+      updated_at: '2025-07-02T11:00:00Z',
+    },
   ];
 
   beforeEach(() => {
     store = mockStore({
       history: {
-        selectedItem: null
-      }
+        selectedItem: null,
+      },
     });
-    
+
     store.dispatch = jest.fn();
     (window.confirm as jest.Mock).mockImplementation(() => true);
   });
@@ -58,7 +58,7 @@ describe('HistoryList', () => {
 
   test('renders history items correctly', () => {
     renderComponent();
-    
+
     expect(screen.getByText('쿼리 #query123')).toBeInTheDocument();
     expect(screen.getByText('쿼리 #query987')).toBeInTheDocument();
   });
@@ -69,25 +69,25 @@ describe('HistoryList', () => {
         <HistoryList items={[]} />
       </Provider>
     );
-    
+
     expect(screen.getByText('쿼리 이력이 없습니다')).toBeInTheDocument();
   });
 
   test('selects an item when clicked', () => {
     renderComponent();
-    
+
     fireEvent.click(screen.getByText('쿼리 #query123'));
-    
+
     expect(store.dispatch).toHaveBeenCalledWith(setSelectedItem(mockItems[0]));
   });
 
   test('toggles favorite status', () => {
     renderComponent();
-    
+
     // Find and click the star icon for the first item
     const starButtons = screen.getAllByRole('button', { name: '' });
     fireEvent.click(starButtons[0]); // First star button
-    
+
     expect(store.dispatch).toHaveBeenCalledWith(
       toggleFavorite({ historyId: '1', favorite: false })
     );
@@ -95,19 +95,19 @@ describe('HistoryList', () => {
 
   test('opens context menu and deletes an item after confirmation', () => {
     renderComponent();
-    
+
     // Find and click the more options button for the first item
     const moreButtons = screen.getAllByRole('button', { name: 'more options' });
     fireEvent.click(moreButtons[0]);
-    
+
     // Click delete option in the menu
     const deleteMenuItem = screen.getByText('삭제');
     fireEvent.click(deleteMenuItem);
-    
+
     // Confirm deletion in the dialog
     const confirmButton = screen.getByRole('button', { name: '삭제' });
     fireEvent.click(confirmButton);
-    
+
     expect(store.dispatch).toHaveBeenCalledWith(deleteHistoryItem('1'));
   });
 });

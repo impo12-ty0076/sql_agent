@@ -17,16 +17,16 @@ describe('ReportProgress Component', () => {
         },
       },
     });
-    
+
     const { container } = render(
       <Provider store={store}>
         <ReportProgress />
       </Provider>
     );
-    
+
     expect(container.firstChild).toBeNull();
   });
-  
+
   it('renders progress when generating', () => {
     const store = mockStore({
       report: {
@@ -37,13 +37,13 @@ describe('ReportProgress Component', () => {
         },
       },
     });
-    
+
     render(
       <Provider store={store}>
         <ReportProgress />
       </Provider>
     );
-    
+
     expect(screen.getByText('리포트 생성 중')).toBeInTheDocument();
     expect(screen.getByText('데이터 분석 중...')).toBeInTheDocument();
     expect(screen.getByText('45%')).toBeInTheDocument();

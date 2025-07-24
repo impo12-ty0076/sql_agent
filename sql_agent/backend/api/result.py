@@ -59,7 +59,7 @@ class ReportGenerationStatusResponse(BaseModel):
 
 # Create router
 router = APIRouter(
-    prefix="/api/result",
+    prefix="/result",
     tags=["result"],
     responses={401: {"description": "Unauthorized"}},
 )

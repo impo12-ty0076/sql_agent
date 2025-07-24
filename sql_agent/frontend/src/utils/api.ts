@@ -13,27 +13,27 @@ const api = axios.create({
 
 // Request interceptor
 api.interceptors.request.use(
-  (config) => {
+  config => {
     const state = store.getState();
     const token = state.auth.token;
-    
+
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => {
+  response => {
     return response;
   },
-  (error) => {
+  error => {
     if (error.response) {
       // Handle 401 Unauthorized errors
       if (error.response.status === 401) {
@@ -45,7 +45,7 @@ api.interceptors.response.use(
           })
         );
       }
-      
+
       // Handle 403 Forbidden errors
       if (error.response.status === 403) {
         store.dispatch(
@@ -55,7 +55,7 @@ api.interceptors.response.use(
           })
         );
       }
-      
+
       // Handle 500 Server errors
       if (error.response.status >= 500) {
         store.dispatch(
@@ -74,7 +74,7 @@ api.interceptors.response.use(
         })
       );
     }
-    
+
     return Promise.reject(error);
   }
 );

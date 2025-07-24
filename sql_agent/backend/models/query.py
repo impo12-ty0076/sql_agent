@@ -71,7 +71,7 @@ class Query(BaseModel):
         return v
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         use_enum_values = True
 
 
@@ -124,7 +124,7 @@ class QueryResult(BaseModel):
         return v
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class QueryResultCreate(BaseModel):
@@ -156,7 +156,7 @@ class Visualization(BaseModel):
         return v
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         use_enum_values = True
 
 
@@ -178,7 +178,7 @@ class Report(BaseModel):
         return v
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ReportCreate(BaseModel):
@@ -203,7 +203,7 @@ class QueryHistory(BaseModel):
     updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SharedQuery(BaseModel):
@@ -225,4 +225,4 @@ class SharedQuery(BaseModel):
         return v
 
     class Config:
-        orm_mode = True
+        from_attributes = True

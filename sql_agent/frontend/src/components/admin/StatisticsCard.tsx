@@ -27,7 +27,10 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({
             {title}
             {description && (
               <Tooltip title={description} arrow placement="top">
-                <InfoIcon fontSize="small" sx={{ ml: 0.5, fontSize: '1rem', verticalAlign: 'middle' }} />
+                <InfoIcon
+                  fontSize="small"
+                  sx={{ ml: 0.5, fontSize: '1rem', verticalAlign: 'middle' }}
+                />
               </Tooltip>
             )}
           </Typography>

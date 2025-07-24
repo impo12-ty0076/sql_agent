@@ -23,7 +23,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [formErrors, setFormErrors] = useState({ username: '', password: '' });
-  
+
   const navigate = useNavigate();
   const { isAuthenticated, loading, error, login } = useAuth();
 
@@ -57,11 +57,11 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     const result = await login(username, password);
-    
+
     if (result.success) {
       // Login successful, navigation is handled in the useAuth hook
     } else {
@@ -101,18 +101,18 @@ const Login: React.FC = () => {
               SQL DB LLM Agent
             </Typography>
           </Box>
-          
+
           <CardContent sx={{ px: 4, py: 3 }}>
             <Typography component="h2" variant="h5" align="center" sx={{ mb: 3 }}>
               로그인
             </Typography>
-            
+
             {error && (
               <Alert severity="error" sx={{ mb: 2 }}>
                 {error}
               </Alert>
             )}
-            
+
             <Box component="form" onSubmit={handleSubmit} noValidate>
               <TextField
                 margin="normal"
@@ -124,13 +124,13 @@ const Login: React.FC = () => {
                 autoComplete="username"
                 autoFocus
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={e => setUsername(e.target.value)}
                 error={!!formErrors.username}
                 helperText={formErrors.username}
                 disabled={loading}
                 variant="outlined"
               />
-              
+
               <TextField
                 margin="normal"
                 required
@@ -141,7 +141,7 @@ const Login: React.FC = () => {
                 id="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 error={!!formErrors.password}
                 helperText={formErrors.password}
                 disabled={loading}
@@ -160,7 +160,7 @@ const Login: React.FC = () => {
                   ),
                 }}
               />
-              
+
               <Button
                 type="submit"
                 fullWidth
@@ -170,16 +170,16 @@ const Login: React.FC = () => {
               >
                 {loading ? <CircularProgress size={24} color="inherit" /> : '로그인'}
               </Button>
-              
+
               <Divider sx={{ my: 2 }} />
-              
+
               <Box sx={{ textAlign: 'center' }}>
-                <Link 
-                  href="#" 
-                  variant="body2" 
-                  onClick={(e) => { 
-                    e.preventDefault(); 
-                    alert('비밀번호 재설정을 위해 관리자에게 문의하세요'); 
+                <Link
+                  href="#"
+                  variant="body2"
+                  onClick={e => {
+                    e.preventDefault();
+                    alert('비밀번호 재설정을 위해 관리자에게 문의하세요');
                   }}
                 >
                   비밀번호를 잊으셨나요?
@@ -188,7 +188,7 @@ const Login: React.FC = () => {
             </Box>
           </CardContent>
         </Card>
-        
+
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 5 }}>
           © {new Date().getFullYear()} SQL DB LLM Agent System
         </Typography>

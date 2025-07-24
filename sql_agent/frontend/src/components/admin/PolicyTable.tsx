@@ -117,37 +117,32 @@ const PolicyTable: React.FC<PolicyTableProps> = ({
                 </TableCell>
               </TableRow>
             ) : (
-              policies
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((policy) => (
-                  <TableRow key={policy.id} hover>
-                    <TableCell>{policy.name}</TableCell>
-                    <TableCell>{policy.description}</TableCell>
-                    <TableCell>{policy.settings.maxQueriesPerDay}</TableCell>
-                    <TableCell>{policy.settings.maxQueryExecutionTime}</TableCell>
-                    <TableCell>{policy.settings.maxResultSize} rows</TableCell>
-                    <TableCell>{policy.appliedToUsers} users</TableCell>
-                    <TableCell>
-                      <Tooltip title="Edit Policy">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditPolicy(policy.id)}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Delete Policy">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => onDeletePolicy(policy.id)}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))
+              policies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(policy => (
+                <TableRow key={policy.id} hover>
+                  <TableCell>{policy.name}</TableCell>
+                  <TableCell>{policy.description}</TableCell>
+                  <TableCell>{policy.settings.maxQueriesPerDay}</TableCell>
+                  <TableCell>{policy.settings.maxQueryExecutionTime}</TableCell>
+                  <TableCell>{policy.settings.maxResultSize} rows</TableCell>
+                  <TableCell>{policy.appliedToUsers} users</TableCell>
+                  <TableCell>
+                    <Tooltip title="Edit Policy">
+                      <IconButton size="small" onClick={() => handleEditPolicy(policy.id)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete Policy">
+                      <IconButton
+                        size="small"
+                        color="error"
+                        onClick={() => onDeletePolicy(policy.id)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>

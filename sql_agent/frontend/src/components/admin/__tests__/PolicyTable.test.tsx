@@ -116,7 +116,7 @@ describe('PolicyTable Component', () => {
 
     const searchInput = screen.getByLabelText('Search Policies');
     fireEvent.change(searchInput, { target: { value: 'admin' } });
-    
+
     expect(mockFilterChange).toHaveBeenCalledWith({ searchTerm: 'admin' });
   });
 
@@ -136,7 +136,7 @@ describe('PolicyTable Component', () => {
     // Find all delete buttons and click the first one
     const deleteButtons = screen.getAllByTitle('Delete Policy');
     fireEvent.click(deleteButtons[0]);
-    
+
     expect(mockDeletePolicy).toHaveBeenCalledWith('1');
   });
 });

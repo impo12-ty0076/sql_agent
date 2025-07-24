@@ -21,6 +21,7 @@ from ..db.crud.system_log import (
 from ..db.crud.user import get_users
 from ..db.crud.query_stats import get_query_count, get_recent_queries, get_avg_query_time, get_query_error_count
 from ..db.models.user import User
+from ..db.models.system_log import SystemLog
 from ..db.models.query import QueryDB
 from ..models.system import (
     SystemLogCreate, 
@@ -128,16 +129,23 @@ class SystemMonitoringService:
             QueryDB.start_time >= yesterday
         ).scalar() or 0
         
-        # Calculate average query time
-        avg_query_time_ms = 0
-        query_times = db.query(
-            func.avg(func.datediff(func.millisecond, QueryDB.start_time, QueryDB.end_time))
-        ).filter(
-            QueryDB.end_time.isnot(None)
-        ).scalar()
-        
-        if query_times:
-            avg_query_time_ms = float(query_times)
+        # Calculate average query time (ms) in a database-agnostic way
+        dialect_name = db.bind.dialect.name if hasattr(db.bind, "dialect") else "sqlite"
+
+        if dialect_name == "sqlite":
+            diff_expr = (
+                (func.julianday(QueryDB.end_time) - func.julianday(QueryDB.start_time)) * 24 * 60 * 60 * 1000
+            )
+        else:
+            diff_expr = func.datediff(func.millisecond, QueryDB.start_time, QueryDB.end_time)
+
+        query_times = (
+            db.query(func.avg(diff_expr))
+            .filter(QueryDB.end_time.isnot(None))
+            .scalar()
+        )
+
+        avg_query_time_ms = float(query_times) if query_times else 0
         
         # Get error count in the last 24 hours
         error_count_24h = count_errors_by_period(db, hours=24)
@@ -268,14 +276,24 @@ class SystemMonitoringService:
             # Get last activity time
             last_active = user.last_login or user.created_at
             
-            # Calculate average query time
-            avg_query_time = db.query(
-                func.avg(func.datediff(func.millisecond, QueryDB.start_time, QueryDB.end_time))
-            ).filter(
-                QueryDB.user_id == user.id,
-                QueryDB.end_time.isnot(None),
-                QueryDB.start_time >= start_date
-            ).scalar() or 0
+            # Calculate average query time (ms) per user in a DB-agnostic way
+            if db.bind.dialect.name == "sqlite":
+                diff_expr_user = (
+                    (func.julianday(QueryDB.end_time) - func.julianday(QueryDB.start_time)) * 24 * 60 * 60 * 1000
+                )
+            else:
+                diff_expr_user = func.datediff(func.millisecond, QueryDB.start_time, QueryDB.end_time)
+
+            avg_query_time = (
+                db.query(func.avg(diff_expr_user))
+                .filter(
+                    QueryDB.user_id == user.id,
+                    QueryDB.end_time.isnot(None),
+                    QueryDB.start_time >= start_date,
+                )
+                .scalar()
+                or 0
+            )
             
             # Count errors for this user
             error_count = db.query(func.count(SystemLog.id)).filter(

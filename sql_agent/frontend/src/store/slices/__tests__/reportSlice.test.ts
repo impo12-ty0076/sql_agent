@@ -34,10 +34,13 @@ describe('reportSlice', () => {
   });
 
   it('should handle updateReportOptions', () => {
-    const actual = reportReducer(initialState, updateReportOptions({
-      visualizationTypes: ['bar', 'scatter'],
-      includeInsights: false,
-    }));
+    const actual = reportReducer(
+      initialState,
+      updateReportOptions({
+        visualizationTypes: ['bar', 'scatter'],
+        includeInsights: false,
+      })
+    );
     expect(actual.reportGenerationOptions).toEqual({
       visualizationTypes: ['bar', 'scatter'],
       includeInsights: false,
@@ -55,10 +58,13 @@ describe('reportSlice', () => {
   });
 
   it('should handle updateReportProgress', () => {
-    const actual = reportReducer(initialState, updateReportProgress({
-      progress: 50,
-      statusMessage: '데이터 분석 중...',
-    }));
+    const actual = reportReducer(
+      initialState,
+      updateReportProgress({
+        progress: 50,
+        statusMessage: '데이터 분석 중...',
+      })
+    );
     expect(actual.reportGenerationStatus.progress).toEqual(50);
     expect(actual.reportGenerationStatus.statusMessage).toEqual('데이터 분석 중...');
   });
@@ -71,7 +77,7 @@ describe('reportSlice', () => {
       insights: [],
       createdAt: '2023-09-15T10:30:00Z',
     };
-    
+
     const actual = reportReducer(initialState, reportGenerationSuccess(mockReport));
     expect(actual.currentReport).toEqual(mockReport);
     expect(actual.reportGenerationStatus.isGenerating).toEqual(false);
@@ -100,7 +106,7 @@ describe('reportSlice', () => {
         statusMessage: '리포트 생성 완료',
       },
     };
-    
+
     const actual = reportReducer(stateWithReport, clearReport());
     expect(actual.currentReport).toBeNull();
     expect(actual.reportGenerationStatus.progress).toEqual(0);

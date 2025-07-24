@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { 
-  TextField, 
-  Button, 
-  Box, 
-  Typography, 
-  Paper, 
-  CircularProgress, 
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Paper,
+  CircularProgress,
   FormControlLabel,
   Switch,
   Collapse,
   IconButton,
   Tooltip,
-  Alert
+  Alert,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store';
@@ -30,12 +30,12 @@ interface NaturalLanguageQueryInputProps {
 const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
   onQueryComplete,
   disabled = false,
-  placeholder = "예: 지난 달 매출이 가장 높은 상품 5개를 보여줘"
+  placeholder = '예: 지난 달 매출이 가장 높은 상품 5개를 보여줘',
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.query);
   const { selectedDatabase } = useSelector((state: RootState) => state.db);
-  
+
   const [query, setQuery] = useState('');
   const [useRag, setUseRag] = useState(false);
   const [sqlResult, setSqlResult] = useState<NaturalLanguageQueryResult | null>(null);
@@ -48,10 +48,10 @@ const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || !selectedDatabase?.id) return;
-    
+
     setError(null);
     setProcessingStep('review');
-    
+
     try {
       const result = await dispatch(
         queryService.processNaturalLanguage(selectedDatabase.id, query, useRag)
@@ -66,14 +66,12 @@ const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
 
   const handleExecuteSql = async () => {
     if (!selectedDatabase?.id || !modifiedSql.trim()) return;
-    
+
     setError(null);
     setProcessingStep('executing');
-    
+
     try {
-      const result = await dispatch(
-        queryService.executeQuery(selectedDatabase.id, modifiedSql)
-      );
+      const result = await dispatch(queryService.executeQuery(selectedDatabase.id, modifiedSql));
       onQueryComplete(result);
       // Reset to initial state for next query
       setProcessingStep('input');
@@ -100,23 +98,18 @@ const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
         multiline
         rows={3}
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={e => setQuery(e.target.value)}
         placeholder={placeholder}
         fullWidth
         variant="outlined"
         disabled={disabled || loading}
-        helperText={disabled ? "데이터베이스에 연결한 후 질의할 수 있습니다." : ""}
+        helperText={disabled ? '데이터베이스에 연결한 후 질의할 수 있습니다.' : ''}
       />
-      
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <FormControlLabel
           control={
-            <Switch
-              checked={useRag}
-              onChange={handleRagToggle}
-              name="ragToggle"
-              color="primary"
-            />
+            <Switch checked={useRag} onChange={handleRagToggle} name="ragToggle" color="primary" />
           }
           label={
             <Tooltip title="RAG 시스템은 키워드 기반 검색을 통해 관련 데이터를 검색하고 결과를 제공합니다.">
@@ -124,7 +117,7 @@ const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
             </Tooltip>
           }
         />
-        
+
         <Button
           type="submit"
           variant="contained"
@@ -147,45 +140,46 @@ const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
       <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
         <Typography variant="body1">{query}</Typography>
       </Paper>
-      
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-        <Typography variant="subtitle1">
-          생성된 SQL:
-        </Typography>
+        <Typography variant="subtitle1">생성된 SQL:</Typography>
         <Box>
           <Tooltip title="SQL 편집">
-            <IconButton 
-              size="small" 
+            <IconButton
+              size="small"
               onClick={() => setEditingSql(!editingSql)}
-              color={editingSql ? "primary" : "default"}
+              color={editingSql ? 'primary' : 'default'}
             >
               <EditIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title={copied ? "복사됨!" : "SQL 복사"}>
+          <Tooltip title={copied ? '복사됨!' : 'SQL 복사'}>
             <IconButton size="small" onClick={handleCopySql}>
               {copied ? <CheckCircleOutlineIcon color="success" /> : <ContentCopyIcon />}
             </IconButton>
           </Tooltip>
         </Box>
       </Box>
-      
+
       {editingSql ? (
         <TextField
           multiline
           rows={5}
           value={modifiedSql}
-          onChange={(e) => setModifiedSql(e.target.value)}
+          onChange={e => setModifiedSql(e.target.value)}
           fullWidth
           variant="outlined"
           sx={{ fontFamily: 'monospace' }}
         />
       ) : (
-        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default', fontFamily: 'monospace', overflowX: 'auto' }}>
+        <Paper
+          variant="outlined"
+          sx={{ p: 2, bgcolor: 'background.default', fontFamily: 'monospace', overflowX: 'auto' }}
+        >
           <pre style={{ margin: 0 }}>{modifiedSql}</pre>
         </Paper>
       )}
-      
+
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <Button
           variant="outlined"
@@ -196,7 +190,7 @@ const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
         >
           뒤로
         </Button>
-        
+
         <Button
           variant="contained"
           color="primary"
@@ -217,7 +211,7 @@ const NaturalLanguageQueryInput: React.FC<NaturalLanguageQueryInputProps> = ({
           {error}
         </Alert>
       )}
-      
+
       {processingStep === 'input' && renderInputStep()}
       {processingStep === 'review' && renderReviewStep()}
       {processingStep === 'executing' && (

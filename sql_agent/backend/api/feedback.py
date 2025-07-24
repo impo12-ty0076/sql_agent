@@ -24,7 +24,7 @@ from ..services.notification_service import NotificationService
 from ..core.auth import get_current_user, get_current_active_user
 from ..models.user import UserRole, User
 
-router = APIRouter(prefix="/api/feedback", tags=["피드백"])
+router = APIRouter(prefix="/feedback", tags=["피드백"])
 
 
 def get_feedback_service(db: Session = Depends(get_db)) -> FeedbackService:

@@ -1,5 +1,5 @@
 import api from './api';
-import { User, UserFilter, Policy, PolicyFilter, UserPermissions, PolicySettings, Database } from '../types/admin';
+import { User, UserFilter, Policy, PolicyFilter, UserPermissions, Database } from '../types/admin';
 
 // Types for admin service
 export interface SystemStats {
@@ -30,7 +30,7 @@ export interface LogEntry {
   category: 'auth' | 'query' | 'system' | 'security';
   message: string;
   userId?: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
 }
 
 export interface LogFilter {
@@ -57,102 +57,107 @@ export interface ChartData {
 export const adminService = {
   // Get system statistics
   getSystemStats: async (): Promise<SystemStats> => {
-    const response = await api.get('/admin/stats');
+    const response = await api.get('/api/admin/stats');
     return response.data;
   },
 
   // Get system status
   getSystemStatus: async (): Promise<SystemStatus> => {
-    const response = await api.get('/admin/status');
+    const response = await api.get('/api/admin/status');
     return response.data;
   },
 
   // Get logs with optional filtering
   getLogs: async (filter?: LogFilter): Promise<LogEntry[]> => {
-    const response = await api.get('/admin/logs', { params: filter });
+    const response = await api.get('/api/admin/logs', { params: filter });
     return response.data;
   },
 
   // Get usage statistics for charts
   getUsageStats: async (period: 'day' | 'week' | 'month'): Promise<ChartData> => {
-    const response = await api.get(`/admin/usage-stats/${period}`);
+    const response = await api.get(`/api/admin/usage-stats/${period}`);
     return response.data;
   },
 
   // Get error statistics for charts
   getErrorStats: async (period: 'day' | 'week' | 'month'): Promise<ChartData> => {
-    const response = await api.get(`/admin/error-stats/${period}`);
+    const response = await api.get(`/api/admin/error-stats/${period}`);
     return response.data;
   },
 
   // Get performance metrics for charts
   getPerformanceMetrics: async (period: 'day' | 'week' | 'month'): Promise<ChartData> => {
-    const response = await api.get(`/admin/performance/${period}`);
+    const response = await api.get(`/api/admin/performance/${period}`);
     return response.data;
   },
 
   // User management functions
   getUsers: async (filter?: UserFilter): Promise<User[]> => {
-    const response = await api.get('/admin/users', { params: filter });
+    const response = await api.get('/api/admin/users', { params: filter });
     return response.data;
   },
 
   getUserById: async (userId: string): Promise<User> => {
-    const response = await api.get(`/admin/users/${userId}`);
+    const response = await api.get(`/api/admin/users/${userId}`);
     return response.data;
   },
 
-  updateUserStatus: async (userId: string, status: 'active' | 'inactive' | 'suspended'): Promise<User> => {
-    const response = await api.patch(`/admin/users/${userId}/status`, { status });
+  updateUserStatus: async (
+    userId: string,
+    status: 'active' | 'inactive' | 'suspended'
+  ): Promise<User> => {
+    const response = await api.patch(`/api/admin/users/${userId}/status`, { status });
     return response.data;
   },
 
   updateUserRole: async (userId: string, role: 'user' | 'admin'): Promise<User> => {
-    const response = await api.patch(`/admin/users/${userId}/role`, { role });
+    const response = await api.patch(`/api/admin/users/${userId}/role`, { role });
     return response.data;
   },
 
   updateUserPermissions: async (userId: string, permissions: UserPermissions): Promise<User> => {
-    const response = await api.put(`/admin/users/${userId}/permissions`, permissions);
+    const response = await api.put(`/api/admin/users/${userId}/permissions`, permissions);
     return response.data;
   },
 
   // Policy management functions
   getPolicies: async (filter?: PolicyFilter): Promise<Policy[]> => {
-    const response = await api.get('/admin/policies', { params: filter });
+    const response = await api.get('/api/admin/policies', { params: filter });
     return response.data;
   },
 
   getPolicyById: async (policyId: string): Promise<Policy> => {
-    const response = await api.get(`/admin/policies/${policyId}`);
+    const response = await api.get(`/api/admin/policies/${policyId}`);
     return response.data;
   },
 
-  createPolicy: async (policy: Omit<Policy, 'id' | 'createdAt' | 'updatedAt' | 'appliedToUsers'>): Promise<Policy> => {
-    const response = await api.post('/admin/policies', policy);
+  createPolicy: async (
+    policy: Omit<Policy, 'id' | 'createdAt' | 'updatedAt' | 'appliedToUsers'>
+  ): Promise<Policy> => {
+    const response = await api.post('/api/admin/policies', policy);
     return response.data;
   },
 
   updatePolicy: async (policyId: string, policy: Partial<Policy>): Promise<Policy> => {
-    const response = await api.put(`/admin/policies/${policyId}`, policy);
+    const response = await api.put(`/api/admin/policies/${policyId}`, policy);
     return response.data;
   },
 
   deletePolicy: async (policyId: string): Promise<void> => {
-    await api.delete(`/admin/policies/${policyId}`);
+    await api.delete(`/api/admin/policies/${policyId}`);
   },
 
   applyPolicyToUser: async (policyId: string, userId: string): Promise<void> => {
-    await api.post(`/admin/policies/${policyId}/apply`, { userId });
+    await api.post(`/api/admin/policies/${policyId}/apply`, { userId });
   },
 
   removePolicyFromUser: async (policyId: string, userId: string): Promise<void> => {
-    await api.post(`/admin/policies/${policyId}/remove`, { userId });
+    await api.post(`/api/admin/policies/${policyId}/remove`, { userId });
   },
 
   // Database information for permissions
   getDatabases: async (): Promise<Database[]> => {
-    const response = await api.get('/admin/databases');
+    const response = await api.get('/api/admin/databases');
     return response.data;
-  }
+  },
 };

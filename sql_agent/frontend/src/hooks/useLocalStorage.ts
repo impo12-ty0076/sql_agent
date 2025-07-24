@@ -29,10 +29,10 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => voi
     try {
       // Allow value to be a function so we have same API as useState
       const valueToStore = value instanceof Function ? value(storedValue) : value;
-      
+
       // Save state
       setStoredValue(valueToStore);
-      
+
       // Save to local storage
       if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
@@ -49,10 +49,10 @@ function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => voi
         setStoredValue(JSON.parse(e.newValue));
       }
     };
-    
+
     // Listen for changes to this localStorage key in other tabs
     window.addEventListener('storage', handleStorageChange);
-    
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };

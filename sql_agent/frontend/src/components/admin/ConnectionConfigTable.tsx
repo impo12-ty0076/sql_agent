@@ -17,7 +17,7 @@ import {
   MenuItem,
   Select,
   FormControl,
-  InputLabel
+  InputLabel,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { Edit, Delete, Refresh, Search, Check, Clear } from '@mui/icons-material';
@@ -50,7 +50,7 @@ const ConnectionConfigTable: React.FC<ConnectionConfigTableProps> = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
 }) => {
   const [searchTerm, setSearchTerm] = useState(filter.searchTerm || '');
 
@@ -142,19 +142,23 @@ const ConnectionConfigTable: React.FC<ConnectionConfigTableProps> = ({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} align="center">Loading...</TableCell>
+                <TableCell colSpan={8} align="center">
+                  Loading...
+                </TableCell>
               </TableRow>
             ) : connections.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} align="center">No connection configurations found</TableCell>
+                <TableCell colSpan={8} align="center">
+                  No connection configurations found
+                </TableCell>
               </TableRow>
             ) : (
-              connections.map((connection) => (
+              connections.map(connection => (
                 <TableRow key={connection.id} hover>
                   <TableCell>{connection.name}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={connection.type === 'mssql' ? 'MS-SQL' : 'SAP HANA'} 
+                    <Chip
+                      label={connection.type === 'mssql' ? 'MS-SQL' : 'SAP HANA'}
                       color={connection.type === 'mssql' ? 'primary' : 'secondary'}
                       size="small"
                       variant="outlined"
@@ -164,8 +168,8 @@ const ConnectionConfigTable: React.FC<ConnectionConfigTableProps> = ({
                   <TableCell>{connection.port}</TableCell>
                   <TableCell>{connection.defaultSchema}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={connection.status} 
+                    <Chip
+                      label={connection.status}
                       color={connection.status === 'active' ? 'success' : 'error'}
                       icon={connection.status === 'active' ? <Check /> : <Clear />}
                       size="small"

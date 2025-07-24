@@ -1,20 +1,20 @@
 import React from 'react';
-import { 
-  AppBar, 
-  Toolbar, 
-  Typography, 
-  IconButton, 
-  Box, 
-  Badge, 
-  Menu, 
-  MenuItem, 
-  Tooltip
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Box,
+  Badge,
+  Menu,
+  MenuItem,
+  Tooltip,
 } from '@mui/material';
-import { 
-  Menu as MenuIcon, 
-  Notifications as NotificationsIcon, 
-  Brightness4, 
-  Brightness7 
+import {
+  Menu as MenuIcon,
+  Notifications as NotificationsIcon,
+  Brightness4,
+  Brightness7,
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store';
@@ -38,8 +38,10 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title }) => {
   const dispatch = useDispatch();
   const { theme } = useSelector((state: RootState) => state.ui);
-  const notifications = useSelector((state: RootState) => state.ui.notifications as AppNotification[]);
-  
+  const notifications = useSelector(
+    (state: RootState) => state.ui.notifications as AppNotification[]
+  );
+
   const [notificationAnchorEl, setNotificationAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleNotificationMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -55,8 +57,9 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   };
 
   // Get unread notifications count
-  const unreadNotifications = Array.isArray(notifications) ? 
-    notifications.filter((n: AppNotification) => !n.read).length : 0;
+  const unreadNotifications = Array.isArray(notifications)
+    ? notifications.filter((n: AppNotification) => !n.read).length
+    : 0;
 
   return (
     <AppBar position="static">
@@ -73,14 +76,14 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           {title}
         </Typography>
-        
+
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Tooltip title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
             <IconButton color="inherit" onClick={handleThemeToggle}>
               {theme === 'light' ? <Brightness4 /> : <Brightness7 />}
             </IconButton>
           </Tooltip>
-          
+
           <PermissionGuard>
             <Tooltip title="알림">
               <IconButton color="inherit" onClick={handleNotificationMenuOpen}>
@@ -90,11 +93,10 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
               </IconButton>
             </Tooltip>
           </PermissionGuard>
-          
+
           <UserMenu />
         </Box>
-        
-        
+
         <Menu
           id="notification-menu"
           anchorEl={notificationAnchorEl}

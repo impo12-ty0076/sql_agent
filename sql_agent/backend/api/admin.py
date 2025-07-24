@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Path
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Security
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 
-from ..core.dependencies import get_current_admin_user
-from ..db.session import get_db
-from ..models.user import User, UserResponse
+from ..core.dependencies import get_current_admin_user, get_sync_db
+from ..db.models.user import User as UserModel
+from ..models.user import UserResponse
 from ..models.system import (
     LogLevel, 
     LogCategory, 
@@ -16,14 +18,18 @@ from ..models.system import (
 )
 from ..services.system_monitoring_service import SystemMonitoringService
 
-router = APIRouter()
+bearer_scheme = HTTPBearer()
+
+router = APIRouter(
+    dependencies=[Security(bearer_scheme)]
+)
 
 @router.get("/users", response_model=List[Dict[str, Any]])
 async def get_users(
     skip: int = 0,
     limit: int = 100,
     current_user: UserResponse = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ):
     """
     모든 사용자 목록 조회 (관리자 전용)
@@ -31,13 +37,13 @@ async def get_users(
     - **skip**: 건너뛸 레코드 수
     - **limit**: 반환할 최대 레코드 수
     """
-    users = db.query(User).offset(skip).limit(limit).all()
+    users = db.query(UserModel).offset(skip).limit(limit).all()
     return [user.to_dict() for user in users]
 
 @router.get("/stats", response_model=SystemStatsResponse)
 async def get_system_stats(
     current_user: UserResponse = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ):
     """
     시스템 통계 정보 조회 (관리자 전용)
@@ -57,7 +63,7 @@ async def get_system_logs(
     user_id: Optional[str] = None,
     search_term: Optional[str] = None,
     current_user: UserResponse = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ):
     """
     시스템 로그 조회 (관리자 전용)
@@ -95,7 +101,7 @@ async def get_user_activity(
     limit: int = Query(100, ge=1, le=1000, description="반환할 최대 사용자 수"),
     offset: int = Query(0, ge=0, description="건너뛸 사용자 수"),
     current_user: UserResponse = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ):
     """
     사용자 활동 통계 조회 (관리자 전용)
@@ -120,7 +126,7 @@ async def create_system_log(
     message: str,
     details: Optional[Dict[str, Any]] = None,
     current_user: UserResponse = Depends(get_current_admin_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_sync_db)
 ):
     """
     시스템 로그 이벤트 생성 (관리자 전용)
@@ -142,3 +148,63 @@ async def create_system_log(
     )
     
     return {"status": "success", "message": "로그 이벤트가 생성되었습니다."}
+
+@router.get("/status")
+async def get_system_status(
+    current_user: UserResponse = Depends(get_current_admin_user),
+    db=Depends(get_sync_db)
+):
+    # 임시 Mock 데이터
+    return {
+        "status": "healthy",
+        "components": {
+            "database": "healthy",
+            "api": "healthy",
+            "llm": "healthy",
+            "storage": "healthy"
+        },
+        "uptime": 123456,
+        "lastChecked": "2024-06-01T12:00:00Z"
+    }
+
+@router.get("/usage-stats/{period}")
+async def get_usage_stats(
+    period: str = Path(..., regex="^(day|week|month)$"),
+    current_user: UserResponse = Depends(get_current_admin_user),
+    db=Depends(get_sync_db)
+):
+    # 임시 Mock 데이터
+    return {
+        "labels": ["2024-06-01", "2024-06-02"],
+        "datasets": [
+            {"label": "Queries", "data": [10, 20]}
+        ]
+    }
+
+@router.get("/error-stats/{period}")
+async def get_error_stats(
+    period: str = Path(..., regex="^(day|week|month)$"),
+    current_user: UserResponse = Depends(get_current_admin_user),
+    db=Depends(get_sync_db)
+):
+    # 임시 Mock 데이터
+    return {
+        "labels": ["2024-06-01", "2024-06-02"],
+        "datasets": [
+            {"label": "Errors", "data": [1, 2]}
+        ]
+    }
+
+@router.get("/performance/{period}")
+async def get_performance_metrics(
+    period: str = Path(..., regex="^(day|week|month)$"),
+    current_user: UserResponse = Depends(get_current_admin_user),
+    db=Depends(get_sync_db)
+):
+    # 임시 Mock 데이터
+    return {
+        "labels": ["2024-06-01", "2024-06-02"],
+        "datasets": [
+            {"label": "Response Time", "data": [0.5, 0.6]}
+        ]
+    }

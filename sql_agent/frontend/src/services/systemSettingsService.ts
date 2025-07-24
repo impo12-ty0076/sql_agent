@@ -1,58 +1,67 @@
 import api from './api';
-import { 
-  ConnectionConfig, 
-  ApiKey, 
-  BackupConfig, 
+import {
+  ConnectionConfig,
+  ApiKey,
+  BackupConfig,
   BackupRecord,
   ConnectionConfigFilter,
   ApiKeyFilter,
-  BackupFilter
+  BackupFilter,
 } from '../types/systemSettings';
 
 // System settings service functions
 export const systemSettingsService = {
   // DB Connection management
   getConnectionConfigs: async (filter?: ConnectionConfigFilter): Promise<ConnectionConfig[]> => {
-    const response = await api.get('/admin/connections', { params: filter });
+    const response = await api.get('/api/admin/connections', { params: filter });
     return response.data;
   },
 
   getConnectionConfigById: async (id: string): Promise<ConnectionConfig> => {
-    const response = await api.get(`/admin/connections/${id}`);
+    const response = await api.get(`/api/admin/connections/${id}`);
     return response.data;
   },
 
-  createConnectionConfig: async (config: Omit<ConnectionConfig, 'id' | 'createdAt' | 'updatedAt' | 'passwordLastUpdated'>): Promise<ConnectionConfig> => {
-    const response = await api.post('/admin/connections', config);
+  createConnectionConfig: async (
+    config: Omit<ConnectionConfig, 'id' | 'createdAt' | 'updatedAt' | 'passwordLastUpdated'>
+  ): Promise<ConnectionConfig> => {
+    const response = await api.post('/api/admin/connections', config);
     return response.data;
   },
 
-  updateConnectionConfig: async (id: string, config: Partial<ConnectionConfig>): Promise<ConnectionConfig> => {
-    const response = await api.put(`/admin/connections/${id}`, config);
+  updateConnectionConfig: async (
+    id: string,
+    config: Partial<ConnectionConfig>
+  ): Promise<ConnectionConfig> => {
+    const response = await api.put(`/api/admin/connections/${id}`, config);
     return response.data;
   },
 
   deleteConnectionConfig: async (id: string): Promise<void> => {
-    await api.delete(`/admin/connections/${id}`);
+    await api.delete(`/api/admin/connections/${id}`);
   },
 
-  testConnection: async (config: Partial<ConnectionConfig>): Promise<{ success: boolean; message: string }> => {
-    const response = await api.post('/admin/connections/test', config);
+  testConnection: async (
+    config: Partial<ConnectionConfig>
+  ): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post('/api/admin/connections/test', config);
     return response.data;
   },
 
   // API Key management
   getApiKeys: async (filter?: ApiKeyFilter): Promise<ApiKey[]> => {
-    const response = await api.get('/admin/api-keys', { params: filter });
+    const response = await api.get('/api/admin/api-keys', { params: filter });
     return response.data;
   },
 
   getApiKeyById: async (id: string): Promise<ApiKey> => {
-    const response = await api.get(`/admin/api-keys/${id}`);
+    const response = await api.get(`/api/admin/api-keys/${id}`);
     return response.data;
   },
 
-  createApiKey: async (apiKey: Omit<ApiKey, 'id' | 'createdAt' | 'lastFourDigits'>): Promise<ApiKey & { fullKey: string }> => {
+  createApiKey: async (
+    apiKey: Omit<ApiKey, 'id' | 'createdAt' | 'lastFourDigits'>
+  ): Promise<ApiKey & { fullKey: string }> => {
     const response = await api.post('/admin/api-keys', apiKey);
     return response.data;
   },
@@ -82,7 +91,9 @@ export const systemSettingsService = {
     return response.data;
   },
 
-  createBackupConfig: async (config: Omit<BackupConfig, 'id' | 'createdAt' | 'updatedAt' | 'lastBackupAt' | 'nextBackupAt'>): Promise<BackupConfig> => {
+  createBackupConfig: async (
+    config: Omit<BackupConfig, 'id' | 'createdAt' | 'updatedAt' | 'lastBackupAt' | 'nextBackupAt'>
+  ): Promise<BackupConfig> => {
     const response = await api.post('/admin/backups/configs', config);
     return response.data;
   },
@@ -113,8 +124,8 @@ export const systemSettingsService = {
 
   downloadBackup: async (backupId: string): Promise<Blob> => {
     const response = await api.get(`/admin/backups/records/${backupId}/download`, {
-      responseType: 'blob'
+      responseType: 'blob',
     });
     return response.data;
-  }
+  },
 };

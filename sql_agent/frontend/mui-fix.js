@@ -8,14 +8,8 @@ function addJsExtension(content) {
   // Replace imports from @mui packages without extensions
   // More comprehensive regex to catch different import patterns
   return content
-    .replace(
-      /from ['"](@mui\/[^/'"]+\/[^/'"]+)['"];/g, 
-      'from "$1.js";'
-    )
-    .replace(
-      /from ['"](@mui\/[^/'"]+\/esm\/[^/'"]+)['"];/g,
-      'from "$1.js";'
-    )
+    .replace(/from ['"](@mui\/[^/'"]+\/[^/'"]+)['"];/g, 'from "$1.js";')
+    .replace(/from ['"](@mui\/[^/'"]+\/esm\/[^/'"]+)['"];/g, 'from "$1.js";')
     .replace(
       /import\s+(?:(?:\* as )?[^*{},]+|\{[^{}]*\})\s+from\s+['"](@mui\/[^/'"]+\/[^.'"][^/'"]+)['"];/g,
       (match, p1) => match.replace(p1, `${p1}.js`)
@@ -32,7 +26,7 @@ muiFiles.forEach(file => {
   try {
     const content = fs.readFileSync(file, 'utf8');
     const newContent = addJsExtension(content);
-    
+
     // Only write if content changed
     if (content !== newContent) {
       fs.writeFileSync(file, newContent);

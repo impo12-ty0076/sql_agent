@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { 
-  Button, 
-  MenuItem, 
-  ListItemIcon, 
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogContentText, 
-  DialogTitle 
+import {
+  Button,
+  MenuItem,
+  ListItemIcon,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
 import { ExitToApp, Logout as LogoutIcon } from '@mui/icons-material';
 import useAuth from '../../hooks/useAuth';
@@ -18,10 +18,10 @@ interface LogoutProps {
   showConfirmation?: boolean;
 }
 
-const Logout: React.FC<LogoutProps> = ({ 
-  variant = 'button', 
-  onClick, 
-  showConfirmation = true 
+const Logout: React.FC<LogoutProps> = ({
+  variant = 'button',
+  onClick,
+  showConfirmation = true,
 }) => {
   const { logout } = useAuth();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -45,7 +45,7 @@ const Logout: React.FC<LogoutProps> = ({
 
   const performLogout = async () => {
     await logout();
-    
+
     // Call additional onClick handler if provided
     if (onClick) {
       onClick();
@@ -91,11 +91,7 @@ const Logout: React.FC<LogoutProps> = ({
 
   return (
     <>
-      <Button
-        color="inherit"
-        onClick={handleLogoutClick}
-        startIcon={<ExitToApp />}
-      >
+      <Button color="inherit" onClick={handleLogoutClick} startIcon={<ExitToApp />}>
         로그아웃
       </Button>
 

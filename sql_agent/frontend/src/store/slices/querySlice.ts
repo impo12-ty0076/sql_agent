@@ -58,7 +58,7 @@ const querySlice = createSlice({
     setUseRag: (state, action: PayloadAction<boolean>) => {
       state.useRag = action.payload;
     },
-    executeQueryStart: (state) => {
+    executeQueryStart: state => {
       state.loading = true;
       state.error = null;
     },
@@ -71,7 +71,7 @@ const querySlice = createSlice({
         timestamp: new Date().toISOString(),
         databaseId: '', // This should be set from the selected database
         sql: state.generatedSql,
-        useRag: state.useRag
+        useRag: state.useRag,
       });
       // Limit history to 50 items
       if (state.queryHistory.length > 50) {
@@ -82,10 +82,10 @@ const querySlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    clearQueryResults: (state) => {
+    clearQueryResults: state => {
       state.results = null;
     },
-    fetchSavedQueriesStart: (state) => {
+    fetchSavedQueriesStart: state => {
       state.loading = true;
     },
     fetchSavedQueriesSuccess: (state, action: PayloadAction<SavedQuery[]>) => {
@@ -102,7 +102,7 @@ const querySlice = createSlice({
     deleteQuerySuccess: (state, action: PayloadAction<string>) => {
       state.savedQueries = state.savedQueries.filter(query => query.id !== action.payload);
     },
-    clearQueryError: (state) => {
+    clearQueryError: state => {
       state.error = null;
     },
   },

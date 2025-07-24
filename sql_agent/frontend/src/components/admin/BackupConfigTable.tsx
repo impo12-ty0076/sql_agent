@@ -11,7 +11,7 @@ import {
   IconButton,
   Chip,
   Tooltip,
-  Button
+  Button,
 } from '@mui/material';
 import { Edit, Delete, Backup, Schedule } from '@mui/icons-material';
 import { BackupConfig } from '../../types/systemSettings';
@@ -29,7 +29,7 @@ const BackupConfigTable: React.FC<BackupConfigTableProps> = ({
   loading,
   onEdit,
   onDelete,
-  onBackupNow
+  onBackupNow,
 }) => {
   const formatSchedule = (schedule: string) => {
     return schedule.charAt(0).toUpperCase() + schedule.slice(1);
@@ -58,19 +58,23 @@ const BackupConfigTable: React.FC<BackupConfigTableProps> = ({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} align="center">Loading...</TableCell>
+                <TableCell colSpan={8} align="center">
+                  Loading...
+                </TableCell>
               </TableRow>
             ) : backupConfigs.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} align="center">No backup configurations found</TableCell>
+                <TableCell colSpan={8} align="center">
+                  No backup configurations found
+                </TableCell>
               </TableRow>
             ) : (
-              backupConfigs.map((config) => (
+              backupConfigs.map(config => (
                 <TableRow key={config.id} hover>
                   <TableCell>{config.name}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={formatSchedule(config.schedule)} 
+                    <Chip
+                      label={formatSchedule(config.schedule)}
                       color="primary"
                       size="small"
                       variant="outlined"
@@ -82,13 +86,13 @@ const BackupConfigTable: React.FC<BackupConfigTableProps> = ({
                     {[
                       config.includeSettings && 'Settings',
                       config.includeUserData && 'User Data',
-                      config.includeQueryHistory && 'Query History'
-                    ].filter(Boolean).join(', ')}
+                      config.includeQueryHistory && 'Query History',
+                    ]
+                      .filter(Boolean)
+                      .join(', ')}
                   </TableCell>
                   <TableCell>
-                    {config.lastBackupAt 
-                      ? new Date(config.lastBackupAt).toLocaleString() 
-                      : 'Never'}
+                    {config.lastBackupAt ? new Date(config.lastBackupAt).toLocaleString() : 'Never'}
                   </TableCell>
                   <TableCell>
                     {config.nextBackupAt && config.status === 'active'
@@ -96,16 +100,16 @@ const BackupConfigTable: React.FC<BackupConfigTableProps> = ({
                       : 'N/A'}
                   </TableCell>
                   <TableCell>
-                    <Chip 
-                      label={config.status} 
+                    <Chip
+                      label={config.status}
                       color={getStatusColor(config.status)}
                       size="small"
                     />
                   </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Backup Now">
-                      <IconButton 
-                        onClick={() => onBackupNow(config)} 
+                      <IconButton
+                        onClick={() => onBackupNow(config)}
                         color="primary"
                         disabled={config.status !== 'active'}
                       >

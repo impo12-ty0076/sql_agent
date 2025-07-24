@@ -4,10 +4,10 @@ from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
 
 from ..services.database import DatabaseService
-from ..services.auth import get_current_user
+from ..core.auth import get_current_user
 
 router = APIRouter(
-    prefix="/api/db",
+    prefix="/db",
     tags=["database"],
     responses={401: {"description": "Unauthorized"}},
 )
@@ -23,23 +23,20 @@ class DisconnectDatabaseRequest(BaseModel):
     connection_id: str
 
 @router.get("/list")
-async def list_databases(token: str = Depends(oauth2_scheme)) -> List[Dict[str, Any]]:
+async def list_databases(current_user: dict = Depends(get_current_user)) -> List[Dict[str, Any]]:
     """
     사용자가 접근 가능한 데이터베이스 목록 조회
     
     Returns:
         List of databases the user has access to
     """
-    # Get the current user from the token
-    current_user = await get_current_user(token)
-    
     # Get databases accessible by the user
-    return await DatabaseService.get_user_databases(current_user.id)
+    return await DatabaseService.get_user_databases(current_user["id"])
 
 @router.post("/connect")
 async def connect_database(
     request: ConnectDatabaseRequest,
-    token: str = Depends(oauth2_scheme)
+    current_user: dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
     특정 데이터베이스에 연결
@@ -50,16 +47,13 @@ async def connect_database(
     Returns:
         Connection status information including connection_id
     """
-    # Get the current user from the token
-    current_user = await get_current_user(token)
-    
     # Connect to the database
-    return await DatabaseService.connect_database(request.db_id, current_user.id)
+    return await DatabaseService.connect_database(request.db_id, current_user["id"])
 
 @router.get("/schema")
 async def get_database_schema(
     db_id: str = Query(..., description="Database ID to get schema for"),
-    token: str = Depends(oauth2_scheme)
+    current_user: dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
     데이터베이스 스키마 정보 조회
@@ -70,16 +64,13 @@ async def get_database_schema(
     Returns:
         Database schema information including tables, columns, and relationships
     """
-    # Get the current user from the token
-    current_user = await get_current_user(token)
-    
     # Get the database schema
-    return await DatabaseService.get_database_schema(db_id, current_user.id)
+    return await DatabaseService.get_database_schema(db_id, current_user["id"])
 
 @router.post("/disconnect")
 async def disconnect_database(
     request: DisconnectDatabaseRequest,
-    token: str = Depends(oauth2_scheme)
+    current_user: dict = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """
     데이터베이스 연결 종료
@@ -90,8 +81,5 @@ async def disconnect_database(
     Returns:
         Disconnection status information
     """
-    # Get the current user from the token
-    current_user = await get_current_user(token)
-    
     # Disconnect from the database
-    return await DatabaseService.disconnect_database(request.connection_id, current_user.id)
+    return await DatabaseService.disconnect_database(request.connection_id, current_user["id"])

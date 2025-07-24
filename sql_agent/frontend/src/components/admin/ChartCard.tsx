@@ -1,5 +1,13 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, CircularProgress, ToggleButtonGroup, ToggleButton } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  CircularProgress,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
 import { Line, Bar, Pie } from 'react-chartjs-2';
 import { ChartData } from '../../services/adminService';
 import {

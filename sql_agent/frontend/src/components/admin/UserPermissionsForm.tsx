@@ -148,12 +148,8 @@ const UserPermissionsForm: React.FC<UserPermissionsFormProps> = ({
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth size="small">
                   <InputLabel>Database</InputLabel>
-                  <Select
-                    value={selectedDbId}
-                    onChange={handleDatabaseChange}
-                    label="Database"
-                  >
-                    {databases.map((db) => (
+                  <Select value={selectedDbId} onChange={handleDatabaseChange} label="Database">
+                    {databases.map(db => (
                       <MenuItem key={db.id} value={db.id}>
                         {db.name} ({db.type})
                       </MenuItem>
@@ -170,9 +166,9 @@ const UserPermissionsForm: React.FC<UserPermissionsFormProps> = ({
                     value={selectedSchemas}
                     onChange={handleSchemaChange}
                     input={<OutlinedInput label="Schemas" />}
-                    renderValue={(selected) => (
+                    renderValue={selected => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
+                        {selected.map(value => (
                           <Chip key={value} label={value} size="small" />
                         ))}
                       </Box>
@@ -181,7 +177,7 @@ const UserPermissionsForm: React.FC<UserPermissionsFormProps> = ({
                     {selectedDbId &&
                       databases
                         .find(db => db.id === selectedDbId)
-                        ?.schemas.map((schema) => (
+                        ?.schemas.map(schema => (
                           <MenuItem key={schema.name} value={schema.name}>
                             <Checkbox checked={selectedSchemas.indexOf(schema.name) > -1} />
                             <ListItemText primary={schema.name} />
@@ -200,15 +196,15 @@ const UserPermissionsForm: React.FC<UserPermissionsFormProps> = ({
                     value={selectedTables}
                     onChange={handleTableChange}
                     input={<OutlinedInput label="Tables" />}
-                    renderValue={(selected) => (
+                    renderValue={selected => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
+                        {selected.map(value => (
                           <Chip key={value} label={value} size="small" />
                         ))}
                       </Box>
                     )}
                   >
-                    {availableTables.map((table) => (
+                    {availableTables.map(table => (
                       <MenuItem key={table} value={table}>
                         <Checkbox checked={selectedTables.indexOf(table) > -1} />
                         <ListItemText primary={table} />
@@ -265,7 +261,7 @@ const UserPermissionsForm: React.FC<UserPermissionsFormProps> = ({
                     Schemas:
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
-                    {permission.allowedSchemas.map((schema) => (
+                    {permission.allowedSchemas.map(schema => (
                       <Chip key={schema} label={schema} size="small" />
                     ))}
                   </Box>
@@ -276,7 +272,7 @@ const UserPermissionsForm: React.FC<UserPermissionsFormProps> = ({
                       Tables:
                     </Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
-                      {permission.allowedTables.map((table) => (
+                      {permission.allowedTables.map(table => (
                         <Chip key={table} label={table} size="small" />
                       ))}
                     </Box>

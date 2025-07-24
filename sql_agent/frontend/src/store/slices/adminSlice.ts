@@ -1,6 +1,21 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { adminService, SystemStats, SystemStatus, LogEntry, LogFilter, ChartData } from '../../services/adminService';
-import { User, UserFilter, Policy, PolicyFilter, UserPermissions, PolicySettings, Database } from '../../types/admin';
+import {
+  adminService,
+  SystemStats,
+  SystemStatus,
+  LogEntry,
+  LogFilter,
+  ChartData,
+} from '../../services/adminService';
+import {
+  User,
+  UserFilter,
+  Policy,
+  PolicyFilter,
+  UserPermissions,
+  PolicySettings,
+  Database,
+} from '../../types/admin';
 
 // Define the state interface
 interface AdminState {
@@ -178,7 +193,9 @@ export const fetchPerformanceMetrics = createAsyncThunk(
     try {
       return await adminService.getPerformanceMetrics(period);
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch performance metrics');
+      return rejectWithValue(
+        error.response?.data?.message || 'Failed to fetch performance metrics'
+      );
     }
   }
 );
@@ -208,7 +225,10 @@ export const fetchUserById = createAsyncThunk(
 
 export const updateUserStatus = createAsyncThunk(
   'admin/updateUserStatus',
-  async ({ userId, status }: { userId: string; status: 'active' | 'inactive' | 'suspended' }, { rejectWithValue }) => {
+  async (
+    { userId, status }: { userId: string; status: 'active' | 'inactive' | 'suspended' },
+    { rejectWithValue }
+  ) => {
     try {
       return await adminService.updateUserStatus(userId, status);
     } catch (error: any) {
@@ -230,7 +250,10 @@ export const updateUserRole = createAsyncThunk(
 
 export const updateUserPermissions = createAsyncThunk(
   'admin/updateUserPermissions',
-  async ({ userId, permissions }: { userId: string; permissions: UserPermissions }, { rejectWithValue }) => {
+  async (
+    { userId, permissions }: { userId: string; permissions: UserPermissions },
+    { rejectWithValue }
+  ) => {
     try {
       return await adminService.updateUserPermissions(userId, permissions);
     } catch (error: any) {
@@ -264,7 +287,10 @@ export const fetchPolicyById = createAsyncThunk(
 
 export const createPolicy = createAsyncThunk(
   'admin/createPolicy',
-  async (policy: Omit<Policy, 'id' | 'createdAt' | 'updatedAt' | 'appliedToUsers'>, { rejectWithValue }) => {
+  async (
+    policy: Omit<Policy, 'id' | 'createdAt' | 'updatedAt' | 'appliedToUsers'>,
+    { rejectWithValue }
+  ) => {
     try {
       return await adminService.createPolicy(policy);
     } catch (error: any) {
@@ -275,7 +301,10 @@ export const createPolicy = createAsyncThunk(
 
 export const updatePolicy = createAsyncThunk(
   'admin/updatePolicy',
-  async ({ policyId, policy }: { policyId: string; policy: Partial<Policy> }, { rejectWithValue }) => {
+  async (
+    { policyId, policy }: { policyId: string; policy: Partial<Policy> },
+    { rejectWithValue }
+  ) => {
     try {
       return await adminService.updatePolicy(policyId, policy);
     } catch (error: any) {
@@ -354,16 +383,16 @@ const adminSlice = createSlice({
     setPolicyFilter: (state, action: PayloadAction<PolicyFilter>) => {
       state.policies.filter = action.payload;
     },
-    clearSelectedUser: (state) => {
+    clearSelectedUser: state => {
       state.users.selectedUser = null;
     },
-    clearSelectedPolicy: (state) => {
+    clearSelectedPolicy: state => {
       state.policies.selectedPolicy = null;
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // System Stats
-    builder.addCase(fetchSystemStats.pending, (state) => {
+    builder.addCase(fetchSystemStats.pending, state => {
       state.stats.loading = true;
       state.stats.error = null;
     });
@@ -377,7 +406,7 @@ const adminSlice = createSlice({
     });
 
     // System Status
-    builder.addCase(fetchSystemStatus.pending, (state) => {
+    builder.addCase(fetchSystemStatus.pending, state => {
       state.status.loading = true;
       state.status.error = null;
     });
@@ -391,7 +420,7 @@ const adminSlice = createSlice({
     });
 
     // Logs
-    builder.addCase(fetchLogs.pending, (state) => {
+    builder.addCase(fetchLogs.pending, state => {
       state.logs.loading = true;
       state.logs.error = null;
     });
@@ -405,7 +434,7 @@ const adminSlice = createSlice({
     });
 
     // Usage Stats
-    builder.addCase(fetchUsageStats.pending, (state) => {
+    builder.addCase(fetchUsageStats.pending, state => {
       state.usageStats.loading = true;
       state.usageStats.error = null;
     });
@@ -419,7 +448,7 @@ const adminSlice = createSlice({
     });
 
     // Error Stats
-    builder.addCase(fetchErrorStats.pending, (state) => {
+    builder.addCase(fetchErrorStats.pending, state => {
       state.errorStats.loading = true;
       state.errorStats.error = null;
     });
@@ -433,7 +462,7 @@ const adminSlice = createSlice({
     });
 
     // Performance Metrics
-    builder.addCase(fetchPerformanceMetrics.pending, (state) => {
+    builder.addCase(fetchPerformanceMetrics.pending, state => {
       state.performanceMetrics.loading = true;
       state.performanceMetrics.error = null;
     });
@@ -447,7 +476,7 @@ const adminSlice = createSlice({
     });
 
     // Users
-    builder.addCase(fetchUsers.pending, (state) => {
+    builder.addCase(fetchUsers.pending, state => {
       state.users.loading = true;
       state.users.error = null;
     });
@@ -460,7 +489,7 @@ const adminSlice = createSlice({
       state.users.error = action.payload as string;
     });
 
-    builder.addCase(fetchUserById.pending, (state) => {
+    builder.addCase(fetchUserById.pending, state => {
       state.users.loading = true;
       state.users.error = null;
     });
@@ -475,7 +504,7 @@ const adminSlice = createSlice({
 
     builder.addCase(updateUserStatus.fulfilled, (state, action) => {
       const updatedUser = action.payload;
-      state.users.data = state.users.data.map(user => 
+      state.users.data = state.users.data.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       );
       if (state.users.selectedUser?.id === updatedUser.id) {
@@ -485,7 +514,7 @@ const adminSlice = createSlice({
 
     builder.addCase(updateUserRole.fulfilled, (state, action) => {
       const updatedUser = action.payload;
-      state.users.data = state.users.data.map(user => 
+      state.users.data = state.users.data.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       );
       if (state.users.selectedUser?.id === updatedUser.id) {
@@ -495,7 +524,7 @@ const adminSlice = createSlice({
 
     builder.addCase(updateUserPermissions.fulfilled, (state, action) => {
       const updatedUser = action.payload;
-      state.users.data = state.users.data.map(user => 
+      state.users.data = state.users.data.map(user =>
         user.id === updatedUser.id ? updatedUser : user
       );
       if (state.users.selectedUser?.id === updatedUser.id) {
@@ -504,7 +533,7 @@ const adminSlice = createSlice({
     });
 
     // Policies
-    builder.addCase(fetchPolicies.pending, (state) => {
+    builder.addCase(fetchPolicies.pending, state => {
       state.policies.loading = true;
       state.policies.error = null;
     });
@@ -517,7 +546,7 @@ const adminSlice = createSlice({
       state.policies.error = action.payload as string;
     });
 
-    builder.addCase(fetchPolicyById.pending, (state) => {
+    builder.addCase(fetchPolicyById.pending, state => {
       state.policies.loading = true;
       state.policies.error = null;
     });
@@ -536,7 +565,7 @@ const adminSlice = createSlice({
 
     builder.addCase(updatePolicy.fulfilled, (state, action) => {
       const updatedPolicy = action.payload;
-      state.policies.data = state.policies.data.map(policy => 
+      state.policies.data = state.policies.data.map(policy =>
         policy.id === updatedPolicy.id ? updatedPolicy : policy
       );
       if (state.policies.selectedPolicy?.id === updatedPolicy.id) {
@@ -553,7 +582,7 @@ const adminSlice = createSlice({
     });
 
     // Databases
-    builder.addCase(fetchDatabases.pending, (state) => {
+    builder.addCase(fetchDatabases.pending, state => {
       state.databases.loading = true;
       state.databases.error = null;
     });
@@ -569,15 +598,15 @@ const adminSlice = createSlice({
 });
 
 // Export actions and reducer
-export const { 
-  setLogFilter, 
-  setUsageStatsPeriod, 
-  setErrorStatsPeriod, 
+export const {
+  setLogFilter,
+  setUsageStatsPeriod,
+  setErrorStatsPeriod,
   setPerformanceMetricsPeriod,
   setUserFilter,
   setPolicyFilter,
   clearSelectedUser,
-  clearSelectedPolicy
+  clearSelectedPolicy,
 } = adminSlice.actions;
 
 export default adminSlice.reducer;

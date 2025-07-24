@@ -4,7 +4,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 import logging
+logger = logging.getLogger("main")
 import time
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi import Security
 
 # 내부 모듈 임포트
 from .api import auth, database, query, result, admin, python_execution, report_api, error_demo, feedback, policy, system_settings
@@ -13,6 +16,14 @@ from .core.middleware import LoggingMiddleware
 from .core.error_middleware import EnhancedErrorHandler
 from .core.auth_middleware import PermissionMiddleware
 from .db.session import engine, Base
+
+# Initialize database tables and default data (roles, admin user)
+try:
+    from .db.init_db import init_db as init_db_sync
+    init_db_sync()
+    logger.info("Database initialized with default data (roles, admin user)")
+except Exception as e:
+    logger.error(f"Failed to initialize database: {e}")
 from .models.database_exceptions import DatabaseError
 
 # 로깅 설정
@@ -20,7 +31,6 @@ logging.basicConfig(
     level=logging.INFO if settings.DEBUG else logging.WARNING,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
-logger = logging.getLogger("main")
 
 # FastAPI 앱 생성
 app = FastAPI(
@@ -31,6 +41,16 @@ app = FastAPI(
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
 )
+
+# Bearer 인증 스키마 추가 (Swagger UI에서 토큰 입력란 노출)
+bearer_scheme = HTTPBearer()
+
+@app.get("/api/protected-test", tags=["인증 테스트"])
+def protected_test(credentials: HTTPAuthorizationCredentials = Security(bearer_scheme)):
+    """
+    Bearer 토큰 인증 테스트용 엔드포인트
+    """
+    return {"token": credentials.credentials}
 
 # 데이터베이스 테이블 생성 (개발 환경에서만 사용)
 async def create_tables():
@@ -67,15 +87,15 @@ app.add_exception_handler(DatabaseError, EnhancedErrorHandler.database_error_han
 app.add_exception_handler(Exception, EnhancedErrorHandler.http_error_handler)
 
 # API 라우터 등록 (모든 라우터는 /api 접두사 사용)
-app.include_router(auth.router, prefix="/api", tags=["인증"])
-app.include_router(database.router, prefix="/api", tags=["데이터베이스"])
-app.include_router(query.router, prefix="/api", tags=["쿼리"])
-app.include_router(result.router, prefix="/api", tags=["결과"])
-app.include_router(admin.router, prefix="/api/admin", tags=["관리자"])
-app.include_router(policy.router, prefix="/api/admin/policies", tags=["정책 관리"])
-app.include_router(system_settings.router, prefix="/api/admin/system", tags=["시스템 설정"])
-app.include_router(python_execution.router, tags=["파이썬 실행"])
-app.include_router(report_api.router, tags=["리포트"])
+app.include_router(auth.router, prefix="/api")
+app.include_router(database.router, prefix="/api")
+app.include_router(query.router, prefix="/api")
+app.include_router(result.router, prefix="/api")
+app.include_router(admin.router, prefix="/api/admin")
+app.include_router(policy.router, prefix="/api/admin/policies")
+app.include_router(system_settings.router, prefix="/api/admin/system")
+app.include_router(python_execution.router)
+app.include_router(report_api.router)
 app.include_router(error_demo.router)
 app.include_router(feedback.router)
 

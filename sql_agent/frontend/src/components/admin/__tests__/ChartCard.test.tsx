@@ -37,7 +37,7 @@ describe('ChartCard', () => {
         onPeriodChange={mockOnPeriodChange}
       />
     );
-    
+
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
@@ -52,7 +52,7 @@ describe('ChartCard', () => {
         onPeriodChange={mockOnPeriodChange}
       />
     );
-    
+
     expect(screen.getByText('Test error')).toBeInTheDocument();
   });
 
@@ -67,7 +67,7 @@ describe('ChartCard', () => {
         onPeriodChange={mockOnPeriodChange}
       />
     );
-    
+
     expect(screen.getByText('No data available')).toBeInTheDocument();
   });
 
@@ -83,7 +83,7 @@ describe('ChartCard', () => {
         onPeriodChange={mockOnPeriodChange}
       />
     );
-    
+
     expect(screen.getByText('Test Chart')).toBeInTheDocument();
     expect(screen.getByTestId('mock-line-chart')).toBeInTheDocument();
   });
@@ -100,7 +100,7 @@ describe('ChartCard', () => {
         onPeriodChange={mockOnPeriodChange}
       />
     );
-    
+
     expect(screen.getByTestId('mock-bar-chart')).toBeInTheDocument();
   });
 
@@ -116,7 +116,7 @@ describe('ChartCard', () => {
         onPeriodChange={mockOnPeriodChange}
       />
     );
-    
+
     expect(screen.getByTestId('mock-pie-chart')).toBeInTheDocument();
   });
 
@@ -131,10 +131,10 @@ describe('ChartCard', () => {
         onPeriodChange={mockOnPeriodChange}
       />
     );
-    
+
     // Click on week button
     fireEvent.click(screen.getByRole('button', { name: 'week' }));
-    
+
     expect(mockOnPeriodChange).toHaveBeenCalledWith('week');
   });
 });

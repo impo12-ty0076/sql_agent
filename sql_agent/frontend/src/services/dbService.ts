@@ -21,7 +21,8 @@ export const dbService = {
       dispatch(fetchDatabasesSuccess(response.data));
       return response.data;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || '데이터베이스 목록을 불러오는데 실패했습니다.';
+      const errorMessage =
+        error.response?.data?.message || '데이터베이스 목록을 불러오는데 실패했습니다.';
       dispatch(fetchDatabasesFailure(errorMessage));
       throw error;
     }
@@ -32,13 +33,13 @@ export const dbService = {
     try {
       dispatch(fetchDatabasesStart());
       const response = await databaseAPI.connectDatabase(dbId);
-      
+
       // 연결 성공 시 해당 DB를 선택 상태로 변경
       const connectedDb: Database = {
         ...response.data,
-        connected: true
+        connected: true,
       };
-      
+
       dispatch(selectDatabase(connectedDb));
       return connectedDb;
     } catch (error: any) {
@@ -56,7 +57,8 @@ export const dbService = {
       dispatch(fetchTablesSuccess(response.data));
       return response.data;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || '데이터베이스 스키마를 불러오는데 실패했습니다.';
+      const errorMessage =
+        error.response?.data?.message || '데이터베이스 스키마를 불러오는데 실패했습니다.';
       dispatch(fetchTablesFailure(errorMessage));
       throw error;
     }

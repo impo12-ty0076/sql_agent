@@ -25,14 +25,14 @@ import {
   IconButton,
   InputAdornment,
 } from '@mui/material';
-import { 
-  Person, 
-  Settings as SettingsIcon, 
-  Edit, 
-  Visibility, 
+import {
+  Person,
+  Settings as SettingsIcon,
+  Edit,
+  Visibility,
   VisibilityOff,
   Save,
-  Cancel
+  Cancel,
 } from '@mui/icons-material';
 import { RootState } from '../store';
 import { Database } from '../store/slices/dbSlice';
@@ -56,11 +56,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`profile-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -72,25 +68,25 @@ const UserProfile: React.FC = () => {
   const [error, setError] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
+
   // Profile form state
   const [email, setEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   // Preferences form state
   const [defaultDb, setDefaultDb] = useState('');
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [resultsPerPage, setResultsPerPage] = useState(50);
-  
+
   const { user, updateProfile, changePassword } = useAuth();
   const { databases } = useSelector((state: RootState) => state.db as { databases: Database[] });
-  
+
   useEffect(() => {
     if (user) {
       setEmail(user.email || '');
-      
+
       // Load user preferences
       if (user.preferences) {
         setDefaultDb(user.preferences.defaultDb || '');
@@ -99,7 +95,7 @@ const UserProfile: React.FC = () => {
       }
     }
   }, [user]);
-  
+
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     // Clear messages when switching tabs
@@ -107,40 +103,40 @@ const UserProfile: React.FC = () => {
     setError('');
     setEditMode(false);
   };
-  
+
   const toggleEditMode = () => {
     setEditMode(!editMode);
     setSuccess('');
     setError('');
   };
-  
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-  
+
   const validateProfileForm = () => {
     if (newPassword && newPassword.length < 8) {
       setError('새 비밀번호는 8자 이상이어야 합니다');
       return false;
     }
-    
+
     if (newPassword && newPassword !== confirmPassword) {
       setError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다');
       return false;
     }
-    
+
     return true;
   };
-  
+
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateProfileForm()) return;
-    
+
     setLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
       // Update profile information
       if (user) {
@@ -148,21 +144,21 @@ const UserProfile: React.FC = () => {
           ...user,
           email,
         });
-        
+
         if (!result.success) {
           throw new Error(result.error);
         }
       }
-      
+
       // Change password if provided
       if (currentPassword && newPassword) {
         const passwordResult = await changePassword(currentPassword, newPassword);
-        
+
         if (!passwordResult.success) {
           throw new Error(passwordResult.error);
         }
       }
-      
+
       setSuccess('프로필이 성공적으로 업데이트되었습니다');
       setCurrentPassword('');
       setNewPassword('');
@@ -174,14 +170,14 @@ const UserProfile: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   const handlePreferencesSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
       // Update user preferences
       if (user) {
@@ -193,12 +189,12 @@ const UserProfile: React.FC = () => {
             resultsPerPage,
           },
         });
-        
+
         if (!result.success) {
           throw new Error(result.error);
         }
       }
-      
+
       setSuccess('환경설정이 성공적으로 업데이트되었습니다');
       setEditMode(false);
     } catch (err: any) {
@@ -207,7 +203,7 @@ const UserProfile: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <Layout title="사용자 프로필">
       <Container maxWidth="md">
@@ -230,44 +226,52 @@ const UserProfile: React.FC = () => {
                 </Typography>
               }
               action={
-                <IconButton onClick={toggleEditMode} color={editMode ? "primary" : "default"}>
+                <IconButton onClick={toggleEditMode} color={editMode ? 'primary' : 'default'}>
                   <Edit />
                 </IconButton>
               }
             />
           </Card>
         </Box>
-        
+
         <Paper elevation={3}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs 
-              value={tabValue} 
-              onChange={handleTabChange} 
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
               aria-label="profile tabs"
               variant="fullWidth"
             >
-              <Tab 
-                label="프로필 정보" 
-                id="profile-tab-0" 
+              <Tab
+                label="프로필 정보"
+                id="profile-tab-0"
                 aria-controls="profile-tabpanel-0"
                 icon={<Person />}
                 iconPosition="start"
               />
-              <Tab 
-                label="환경설정" 
-                id="profile-tab-1" 
+              <Tab
+                label="환경설정"
+                id="profile-tab-1"
                 aria-controls="profile-tabpanel-1"
                 icon={<SettingsIcon />}
                 iconPosition="start"
               />
             </Tabs>
           </Box>
-          
+
           {/* Profile Information Tab */}
           <TabPanel value={tabValue} index={0}>
-            {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                {success}
+              </Alert>
+            )}
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <Box component="form" onSubmit={handleProfileSubmit} noValidate>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -279,19 +283,19 @@ const UserProfile: React.FC = () => {
                     variant="outlined"
                   />
                 </Grid>
-                
+
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
                     required
                     label="이메일"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     disabled={!editMode || loading}
                     variant="outlined"
                   />
                 </Grid>
-                
+
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -301,7 +305,7 @@ const UserProfile: React.FC = () => {
                     variant="outlined"
                   />
                 </Grid>
-                
+
                 {editMode && (
                   <>
                     <Grid item xs={12}>
@@ -311,14 +315,14 @@ const UserProfile: React.FC = () => {
                         </Typography>
                       </Divider>
                     </Grid>
-                    
+
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
                         type={showPassword ? 'text' : 'password'}
                         label="현재 비밀번호"
                         value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        onChange={e => setCurrentPassword(e.target.value)}
                         disabled={loading}
                         variant="outlined"
                         InputProps={{
@@ -336,40 +340,40 @@ const UserProfile: React.FC = () => {
                         }}
                       />
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
                         type={showPassword ? 'text' : 'password'}
                         label="새 비밀번호"
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                        onChange={e => setNewPassword(e.target.value)}
                         disabled={loading}
                         variant="outlined"
                         helperText="8자 이상 입력해주세요"
                       />
                     </Grid>
-                    
+
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
                         type={showPassword ? 'text' : 'password'}
                         label="새 비밀번호 확인"
                         value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        onChange={e => setConfirmPassword(e.target.value)}
                         disabled={loading}
                         variant="outlined"
                         error={newPassword !== confirmPassword && confirmPassword !== ''}
                         helperText={
-                          newPassword !== confirmPassword && confirmPassword !== '' 
-                            ? '비밀번호가 일치하지 않습니다' 
+                          newPassword !== confirmPassword && confirmPassword !== ''
+                            ? '비밀번호가 일치하지 않습니다'
                             : ' '
                         }
                       />
                     </Grid>
                   </>
                 )}
-                
+
                 {editMode && (
                   <Grid item xs={12}>
                     <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
@@ -395,12 +399,20 @@ const UserProfile: React.FC = () => {
               </Grid>
             </Box>
           </TabPanel>
-          
+
           {/* Preferences Tab */}
           <TabPanel value={tabValue} index={1}>
-            {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-            
+            {success && (
+              <Alert severity="success" sx={{ mb: 2 }}>
+                {success}
+              </Alert>
+            )}
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <Box component="form" onSubmit={handlePreferencesSubmit} noValidate>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -410,13 +422,13 @@ const UserProfile: React.FC = () => {
                       labelId="default-db-label"
                       value={defaultDb}
                       label="기본 데이터베이스"
-                      onChange={(e) => setDefaultDb(e.target.value)}
+                      onChange={e => setDefaultDb(e.target.value)}
                       disabled={!editMode || loading}
                     >
                       <MenuItem value="">
                         <em>선택 안함</em>
                       </MenuItem>
-                      {databases?.map((db) => (
+                      {databases?.map(db => (
                         <MenuItem key={db.id} value={db.id}>
                           {db.name} ({db.type})
                         </MenuItem>
@@ -424,14 +436,14 @@ const UserProfile: React.FC = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                
+
                 <Grid item xs={12}>
                   <Paper variant="outlined" sx={{ p: 2 }}>
                     <FormControlLabel
                       control={
                         <Switch
                           checked={theme === 'dark'}
-                          onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
+                          onChange={e => setTheme(e.target.checked ? 'dark' : 'light')}
                           disabled={!editMode || loading}
                           color="primary"
                         />
@@ -444,7 +456,7 @@ const UserProfile: React.FC = () => {
                     />
                   </Paper>
                 </Grid>
-                
+
                 <Grid item xs={12}>
                   <FormControl fullWidth variant="outlined">
                     <InputLabel id="results-per-page-label">페이지당 결과 수</InputLabel>
@@ -452,7 +464,7 @@ const UserProfile: React.FC = () => {
                       labelId="results-per-page-label"
                       value={resultsPerPage}
                       label="페이지당 결과 수"
-                      onChange={(e) => setResultsPerPage(Number(e.target.value))}
+                      onChange={e => setResultsPerPage(Number(e.target.value))}
                       disabled={!editMode || loading}
                     >
                       <MenuItem value={10}>10</MenuItem>
@@ -462,7 +474,7 @@ const UserProfile: React.FC = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                
+
                 {editMode && (
                   <Grid item xs={12}>
                     <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>

@@ -107,10 +107,12 @@ describe('PolicyManagement Component', () => {
 
     // Click the delete button in the mocked PolicyTable
     fireEvent.click(screen.getByText('Delete Policy'));
-    
+
     // Check if the confirmation dialog is shown
     expect(screen.getByText('Confirm Delete')).toBeInTheDocument();
-    expect(screen.getByText('Are you sure you want to delete this policy? This action cannot be undone.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Are you sure you want to delete this policy? This action cannot be undone.')
+    ).toBeInTheDocument();
   });
 
   test('dispatches deletePolicy when confirmation is confirmed', () => {
@@ -124,10 +126,10 @@ describe('PolicyManagement Component', () => {
 
     // Click the delete button in the mocked PolicyTable
     fireEvent.click(screen.getByText('Delete Policy'));
-    
+
     // Click the confirm button in the dialog
     fireEvent.click(screen.getByText('Delete'));
-    
+
     // Check if deletePolicy was dispatched
     expect(store.dispatch).toHaveBeenCalledTimes(2); // Once for fetchPolicies on mount, once for deletePolicy
   });

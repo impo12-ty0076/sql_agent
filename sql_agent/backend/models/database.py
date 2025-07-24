@@ -203,4 +203,4 @@ class Database(BaseModel):
             raise ValueError(f"Unsupported database type: {self.type}")
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -251,10 +251,10 @@ headers = {
 while True:
     response = requests.get(url, headers=headers)
     status_data = response.json()
-    
+
     if status_data["status"] in ["completed", "failed", "cancelled"]:
         break
-        
+
     print(f"Progress: {status_data['progress']}%")
     time.sleep(1)
 ```

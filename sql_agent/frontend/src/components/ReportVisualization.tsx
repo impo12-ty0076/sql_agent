@@ -1,18 +1,18 @@
 import React from 'react';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Grid, 
-  Card, 
-  CardContent, 
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Card,
+  CardContent,
   CardMedia,
   Divider,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Button
+  Button,
 } from '@mui/material';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -21,20 +21,18 @@ import { RootState } from '../store';
 
 const ReportVisualization: React.FC = () => {
   const { currentReport, error } = useSelector((state: RootState) => state.report);
-  
+
   if (error) {
     return (
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" color="error" gutterBottom>
           리포트 생성 오류
         </Typography>
-        <Typography variant="body2">
-          {error}
-        </Typography>
+        <Typography variant="body2">{error}</Typography>
       </Paper>
     );
   }
-  
+
   if (!currentReport) {
     return (
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
@@ -44,7 +42,7 @@ const ReportVisualization: React.FC = () => {
       </Paper>
     );
   }
-  
+
   const handleDownloadImage = (imageData: string, title: string) => {
     const link = document.createElement('a');
     link.href = imageData;
@@ -53,7 +51,7 @@ const ReportVisualization: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
-  
+
   const handleDownloadReport = () => {
     // Create a simple HTML report
     let reportHtml = `
@@ -72,7 +70,7 @@ const ReportVisualization: React.FC = () => {
         <h1>데이터 분석 리포트</h1>
         <p>생성 시간: ${new Date(currentReport.createdAt).toLocaleString()}</p>
     `;
-    
+
     // Add visualizations
     if (currentReport.visualizations.length > 0) {
       reportHtml += '<h2>시각화</h2>';
@@ -86,7 +84,7 @@ const ReportVisualization: React.FC = () => {
         `;
       });
     }
-    
+
     // Add insights
     if (currentReport.insights.length > 0) {
       reportHtml += '<h2>주요 인사이트</h2>';
@@ -96,9 +94,9 @@ const ReportVisualization: React.FC = () => {
       });
       reportHtml += '</ul></div>';
     }
-    
+
     reportHtml += '</body></html>';
-    
+
     // Create and download the HTML file
     const blob = new Blob([reportHtml], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
@@ -109,20 +107,16 @@ const ReportVisualization: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
-  
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h6">데이터 분석 리포트</Typography>
-        <Button 
-          variant="outlined" 
-          startIcon={<DownloadIcon />}
-          onClick={handleDownloadReport}
-        >
+        <Button variant="outlined" startIcon={<DownloadIcon />} onClick={handleDownloadReport}>
           리포트 다운로드
         </Button>
       </Box>
-      
+
       {/* Visualizations */}
       {currentReport.visualizations.length > 0 && (
         <Box sx={{ mb: 4 }}>
@@ -130,7 +124,7 @@ const ReportVisualization: React.FC = () => {
             시각화
           </Typography>
           <Grid container spacing={3}>
-            {currentReport.visualizations.map((viz) => (
+            {currentReport.visualizations.map(viz => (
               <Grid item xs={12} md={6} key={viz.id}>
                 <Card>
                   <CardMedia
@@ -148,8 +142,8 @@ const ReportVisualization: React.FC = () => {
                         {viz.description}
                       </Typography>
                     )}
-                    <Button 
-                      size="small" 
+                    <Button
+                      size="small"
                       sx={{ mt: 1 }}
                       onClick={() => handleDownloadImage(viz.imageData, viz.title)}
                     >
@@ -162,7 +156,7 @@ const ReportVisualization: React.FC = () => {
           </Grid>
         </Box>
       )}
-      
+
       {/* Insights */}
       {currentReport.insights.length > 0 && (
         <Box sx={{ mb: 3 }}>

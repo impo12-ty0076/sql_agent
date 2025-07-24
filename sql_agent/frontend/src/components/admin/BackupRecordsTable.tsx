@@ -16,16 +16,9 @@ import {
   InputAdornment,
   Button,
   Typography,
-  LinearProgress
+  LinearProgress,
 } from '@mui/material';
-import { 
-  Download, 
-  Restore, 
-  Search, 
-  CheckCircle, 
-  Error, 
-  HourglassTop 
-} from '@mui/icons-material';
+import { Download, Restore, Search, CheckCircle, Error, HourglassTop } from '@mui/icons-material';
 import { BackupRecord, BackupFilter } from '../../types/systemSettings';
 
 interface BackupRecordsTableProps {
@@ -53,7 +46,7 @@ const BackupRecordsTable: React.FC<BackupRecordsTableProps> = ({
   page,
   rowsPerPage,
   onPageChange,
-  onRowsPerPageChange
+  onRowsPerPageChange,
 }) => {
   const [startDate, setStartDate] = useState<string>(
     filter.startDate ? new Date(filter.startDate).toISOString().split('T')[0] : ''
@@ -74,14 +67,14 @@ const BackupRecordsTable: React.FC<BackupRecordsTableProps> = ({
     onFilterChange({
       ...filter,
       startDate: startDate ? new Date(startDate) : undefined,
-      endDate: endDate ? new Date(endDate) : undefined
+      endDate: endDate ? new Date(endDate) : undefined,
     });
   };
 
   const handleStatusChange = (status: 'completed' | 'failed' | 'in_progress' | undefined) => {
     onFilterChange({
       ...filter,
-      status
+      status,
     });
   };
 
@@ -113,11 +106,11 @@ const BackupRecordsTable: React.FC<BackupRecordsTableProps> = ({
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
-    
+
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
+
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
@@ -142,37 +135,32 @@ const BackupRecordsTable: React.FC<BackupRecordsTableProps> = ({
           size="small"
           sx={{ width: 170 }}
         />
-        <Button 
-          variant="outlined" 
-          size="small" 
-          onClick={handleFilterApply}
-          startIcon={<Search />}
-        >
+        <Button variant="outlined" size="small" onClick={handleFilterApply} startIcon={<Search />}>
           Apply Filter
         </Button>
         <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
-          <Chip 
-            label="All" 
+          <Chip
+            label="All"
             color={!filter.status ? 'primary' : 'default'}
             onClick={() => handleStatusChange(undefined)}
             clickable
           />
-          <Chip 
-            label="Completed" 
+          <Chip
+            label="Completed"
             color={filter.status === 'completed' ? 'success' : 'default'}
             onClick={() => handleStatusChange('completed')}
             clickable
             icon={<CheckCircle fontSize="small" />}
           />
-          <Chip 
-            label="Failed" 
+          <Chip
+            label="Failed"
             color={filter.status === 'failed' ? 'error' : 'default'}
             onClick={() => handleStatusChange('failed')}
             clickable
             icon={<Error fontSize="small" />}
           />
-          <Chip 
-            label="In Progress" 
+          <Chip
+            label="In Progress"
             color={filter.status === 'in_progress' ? 'warning' : 'default'}
             onClick={() => handleStatusChange('in_progress')}
             clickable
@@ -198,17 +186,19 @@ const BackupRecordsTable: React.FC<BackupRecordsTableProps> = ({
           <TableBody>
             {backupRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">No backup records found</TableCell>
+                <TableCell colSpan={6} align="center">
+                  No backup records found
+                </TableCell>
               </TableRow>
             ) : (
-              backupRecords.map((record) => (
+              backupRecords.map(record => (
                 <TableRow key={record.id} hover>
                   <TableCell>{new Date(record.timestamp).toLocaleString()}</TableCell>
                   <TableCell>{record.configId}</TableCell>
                   <TableCell>{formatFileSize(record.size)}</TableCell>
                   <TableCell>
-                    <Chip 
-                      label={record.status} 
+                    <Chip
+                      label={record.status}
                       color={getStatusColor(record.status)}
                       size="small"
                       icon={getStatusIcon(record.status)}
@@ -220,14 +210,17 @@ const BackupRecordsTable: React.FC<BackupRecordsTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                    >
                       {record.location}
                     </Typography>
                   </TableCell>
                   <TableCell align="right">
                     <Tooltip title="Download">
-                      <IconButton 
-                        onClick={() => onDownload(record)} 
+                      <IconButton
+                        onClick={() => onDownload(record)}
                         color="primary"
                         disabled={record.status !== 'completed'}
                       >
@@ -235,8 +228,8 @@ const BackupRecordsTable: React.FC<BackupRecordsTableProps> = ({
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Restore">
-                      <IconButton 
-                        onClick={() => onRestore(record)} 
+                      <IconButton
+                        onClick={() => onRestore(record)}
                         color="warning"
                         disabled={record.status !== 'completed'}
                       >

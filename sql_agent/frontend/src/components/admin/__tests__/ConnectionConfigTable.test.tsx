@@ -16,7 +16,7 @@ const mockConnections: ConnectionConfig[] = [
     options: {},
     createdAt: new Date('2023-01-01'),
     updatedAt: new Date('2023-01-01'),
-    status: 'active'
+    status: 'active',
   },
   {
     id: '2',
@@ -30,8 +30,8 @@ const mockConnections: ConnectionConfig[] = [
     options: {},
     createdAt: new Date('2023-01-01'),
     updatedAt: new Date('2023-01-01'),
-    status: 'inactive'
-  }
+    status: 'inactive',
+  },
 ];
 
 const mockProps = {
@@ -46,19 +46,19 @@ const mockProps = {
   page: 0,
   rowsPerPage: 10,
   onPageChange: jest.fn(),
-  onRowsPerPageChange: jest.fn()
+  onRowsPerPageChange: jest.fn(),
 };
 
 describe('ConnectionConfigTable', () => {
   it('renders connection table with data', () => {
     render(<ConnectionConfigTable {...mockProps} />);
-    
+
     // Check if table headers are rendered
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Type')).toBeInTheDocument();
     expect(screen.getByText('Host')).toBeInTheDocument();
     expect(screen.getByText('Port')).toBeInTheDocument();
-    
+
     // Check if connection data is rendered
     expect(screen.getByText('Test DB 1')).toBeInTheDocument();
     expect(screen.getByText('localhost')).toBeInTheDocument();
@@ -103,10 +103,10 @@ describe('ConnectionConfigTable', () => {
     render(<ConnectionConfigTable {...mockProps} />);
     const searchInput = screen.getByLabelText('Search');
     fireEvent.change(searchInput, { target: { value: 'test' } });
-    
+
     const searchButton = screen.getByLabelText('Search');
     fireEvent.click(searchButton);
-    
+
     expect(mockProps.onFilterChange).toHaveBeenCalledWith({ searchTerm: 'test' });
   });
 
@@ -114,10 +114,10 @@ describe('ConnectionConfigTable', () => {
     render(<ConnectionConfigTable {...mockProps} />);
     const typeSelect = screen.getByLabelText('Database Type');
     fireEvent.mouseDown(typeSelect);
-    
+
     const mssqlOption = screen.getByText('MS-SQL');
     fireEvent.click(mssqlOption);
-    
+
     expect(mockProps.onFilterChange).toHaveBeenCalledWith({ type: 'mssql' });
   });
 });

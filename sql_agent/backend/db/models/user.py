@@ -37,6 +37,12 @@ class User(BaseModel):
     feedbacks = relationship("Feedback", back_populates="user", cascade="all, delete-orphan")
     feedback_responses = relationship("FeedbackResponse", back_populates="user", cascade="all, delete-orphan")
     created_policies = relationship("Policy", back_populates="creator", cascade="all, delete-orphan")
+    roles = relationship(
+        "Role",
+        secondary=user_roles,
+        back_populates="users",
+        foreign_keys=[user_roles.c.user_id, user_roles.c.role_id]
+    )
     
     def __repr__(self):
         return f"<User {self.username}>"
@@ -102,7 +108,12 @@ class Role(BaseModel):
     description = Column(String(255), nullable=True)
     
     # Relationships
-    users = relationship("User", secondary=user_roles, backref="roles")
+    users = relationship(
+        "User",
+        secondary=user_roles,
+        back_populates="roles",
+        foreign_keys=[user_roles.c.user_id, user_roles.c.role_id]
+    )
     
     def __repr__(self):
         return f"<Role {self.name}>"

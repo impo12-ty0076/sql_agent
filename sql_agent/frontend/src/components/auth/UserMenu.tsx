@@ -12,12 +12,7 @@ import {
   Box,
   Typography,
 } from '@mui/material';
-import {
-  AccountCircle,
-  Person,
-  Settings,
-  AdminPanelSettings,
-} from '@mui/icons-material';
+import { AccountCircle, Person, Settings, AdminPanelSettings } from '@mui/icons-material';
 import useAuth from '../../hooks/useAuth';
 import Logout from './Logout';
 
@@ -25,46 +20,42 @@ const UserMenu: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { user, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
-  
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  
+
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  
+
   const handleProfileClick = () => {
     navigate('/profile');
     handleMenuClose();
   };
-  
+
   const handleSettingsClick = () => {
     navigate('/settings');
     handleMenuClose();
   };
-  
+
   const handleAdminClick = () => {
     navigate('/admin');
     handleMenuClose();
   };
-  
+
   if (!isAuthenticated) {
     return (
       <Tooltip title="로그인">
-        <IconButton 
-          color="inherit" 
-          onClick={() => navigate('/login')}
-          size="large"
-        >
+        <IconButton color="inherit" onClick={() => navigate('/login')} size="large">
           <AccountCircle />
         </IconButton>
       </Tooltip>
     );
   }
-  
+
   const userInitial = user?.username?.charAt(0).toUpperCase() || 'U';
-  
+
   return (
     <>
       <Tooltip title="계정 설정">
@@ -72,30 +63,29 @@ const UserMenu: React.FC = () => {
           onClick={handleMenuOpen}
           size="small"
           sx={{ ml: 2 }}
-          aria-controls={Boolean(anchorEl) ? 'account-menu' : undefined}
+          aria-controls={anchorEl ? 'account-menu' : undefined}
           aria-haspopup="true"
-          aria-expanded={Boolean(anchorEl) ? 'true' : undefined}
+          aria-expanded={anchorEl ? 'true' : undefined}
         >
-          <Avatar 
-            sx={{ 
-              width: 32, 
-              height: 32, 
+          <Avatar
+            sx={{
+              width: 32,
+              height: 32,
               bgcolor: 'primary.main',
               color: 'white',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             }}
           >
             {userInitial}
           </Avatar>
         </IconButton>
       </Tooltip>
-      
+
       <Menu
         anchorEl={anchorEl}
         id="account-menu"
-        open={Boolean(anchorEl)}
+        open={!!anchorEl}
         onClose={handleMenuClose}
-        onClick={handleMenuClose}
         PaperProps={{
           elevation: 0,
           sx: {
@@ -122,23 +112,23 @@ const UserMenu: React.FC = () => {
             {user?.email}
           </Typography>
         </Box>
-        
+
         <Divider />
-        
+
         <MenuItem onClick={handleProfileClick}>
           <ListItemIcon>
             <Person fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="프로필" />
         </MenuItem>
-        
+
         <MenuItem onClick={handleSettingsClick}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
           <ListItemText primary="환경설정" />
         </MenuItem>
-        
+
         {isAdmin && (
           <MenuItem onClick={handleAdminClick}>
             <ListItemIcon>
@@ -147,10 +137,10 @@ const UserMenu: React.FC = () => {
             <ListItemText primary="관리자 페이지" />
           </MenuItem>
         )}
-        
+
         <Divider />
-        
-        <Logout variant="menuItem" />
+
+        <Logout variant="menuItem" onClick={handleMenuClose} />
       </Menu>
     </>
   );

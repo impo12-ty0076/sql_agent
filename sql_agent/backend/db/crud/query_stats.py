@@ -65,9 +65,19 @@ def get_avg_query_time(db: Session, user_id: Optional[str] = None, days: Optiona
     Returns:
         Average query time in milliseconds
     """
-    query = db.query(
-        func.avg(func.datediff(func.millisecond, QueryDB.start_time, QueryDB.end_time))
-    ).filter(QueryDB.end_time.isnot(None))
+    # Determine database dialect to compute time difference correctly across DB engines
+    dialect_name = db.bind.dialect.name if hasattr(db.bind, "dialect") else "sqlite"
+
+    if dialect_name == "sqlite":
+        # julianday returns days; convert to milliseconds
+        diff_expr = (
+            (func.julianday(QueryDB.end_time) - func.julianday(QueryDB.start_time)) * 24 * 60 * 60 * 1000
+        )
+    else:
+        # For databases like MySQL or SQL Server, use datediff if available
+        diff_expr = func.datediff(func.millisecond, QueryDB.start_time, QueryDB.end_time)
+
+    query = db.query(func.avg(diff_expr)).filter(QueryDB.end_time.isnot(None))
     
     if user_id:
         query = query.filter(QueryDB.user_id == user_id)

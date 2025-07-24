@@ -12,7 +12,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, title }) => {
   const { sidebarOpen } = useSelector((state: RootState) => state.ui as { sidebarOpen: boolean });
-  
+
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <CssBaseline />
@@ -25,10 +25,11 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
           p: 3,
           width: { sm: `calc(100% - ${sidebarOpen ? 240 : 0}px)` },
           ml: { sm: sidebarOpen ? '240px' : 0 },
-          transition: theme => theme.transitions.create(['margin', 'width'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
+          transition: theme =>
+            theme.transitions.create(['margin', 'width'], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
         }}
       >
         <Box sx={{ height: 64 }} /> {/* Toolbar spacer */}

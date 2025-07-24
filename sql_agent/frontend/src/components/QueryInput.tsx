@@ -8,11 +8,11 @@ interface QueryInputProps {
   placeholder?: string;
 }
 
-const QueryInput: React.FC<QueryInputProps> = ({ 
-  onSubmit, 
-  isLoading, 
+const QueryInput: React.FC<QueryInputProps> = ({
+  onSubmit,
+  isLoading,
   disabled = false,
-  placeholder = "예: 지난 달 매출이 가장 높은 상품 5개를 보여줘"
+  placeholder = '예: 지난 달 매출이 가장 높은 상품 5개를 보여줘',
 }) => {
   const [query, setQuery] = useState('');
 
@@ -31,12 +31,12 @@ const QueryInput: React.FC<QueryInputProps> = ({
           multiline
           rows={3}
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={e => setQuery(e.target.value)}
           placeholder={placeholder}
           fullWidth
           variant="outlined"
           disabled={disabled}
-          helperText={disabled ? "데이터베이스에 연결한 후 질의할 수 있습니다." : ""}
+          helperText={disabled ? '데이터베이스에 연결한 후 질의할 수 있습니다.' : ''}
         />
         <Button
           type="submit"

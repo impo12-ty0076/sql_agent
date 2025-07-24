@@ -8,6 +8,8 @@ import logging
 from typing import Callable, Dict, Any, List
 
 from ..core.config import settings
+from ..services.auth import AuthService
+from ..db.session import SessionLocal
 
 logger = logging.getLogger(__name__)
 
@@ -31,28 +33,14 @@ class PermissionMiddleware:
     """Middleware for permission checking"""
     
     async def __call__(self, request: Request, call_next: Callable) -> Response:
-        """
-        Check permissions for request
-        
-        Args:
-            request: FastAPI request
-            call_next: Next middleware or endpoint
-            
-        Returns:
-            Response
-        """
-        # Skip permission check for public paths
         path = request.url.path
         if any(path.startswith(public_path) for public_path in PUBLIC_PATHS):
             return await call_next(request)
         
-        # Check for authentication token
         auth_header = request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
-            # Skip permission check for OPTIONS requests (CORS preflight)
             if request.method == "OPTIONS":
                 return await call_next(request)
-                
             return JSONResponse(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 content={
@@ -63,22 +51,25 @@ class PermissionMiddleware:
                 },
                 headers={"WWW-Authenticate": "Bearer"}
             )
-        
-        # Extract token
         token = auth_header.split(" ")[1]
-        
+        # DB 세션 생성
+        db = SessionLocal()
         try:
-            # Decode token
-            payload = jwt.decode(
-                token,
-                settings.SECRET_KEY,
-                algorithms=[settings.JWT_ALGORITHM]
-            )
-            
-            # Check admin permission for admin paths
+            user = AuthService.get_user_from_token(db, token)
+            if not user:
+                return JSONResponse(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    content={
+                        "status": "error",
+                        "code": "unauthorized",
+                        "message": "Authentication required",
+                        "details": "Invalid, expired, or inactive session token"
+                    },
+                    headers={"WWW-Authenticate": "Bearer"}
+                )
+            # 관리자 권한 체크
             if any(path.startswith(admin_path) for admin_path in ADMIN_PATHS):
-                role = payload.get("role", "user")
-                if role != "admin":
+                if getattr(user, "role", "user") != "admin":
                     return JSONResponse(
                         status_code=status.HTTP_403_FORBIDDEN,
                         content={
@@ -88,28 +79,13 @@ class PermissionMiddleware:
                             "details": "Admin permission required"
                         }
                     )
-            
-            # Add user info to request state
+            # 사용자 정보 저장
             request.state.user = {
-                "id": payload.get("sub"),
-                "username": payload.get("username", ""),
-                "email": payload.get("email", ""),
-                "role": payload.get("role", "user")
+                "id": getattr(user, "id", None),
+                "username": getattr(user, "username", ""),
+                "email": getattr(user, "email", ""),
+                "role": getattr(user, "role", "user")
             }
-            
-            # Continue with request
             return await call_next(request)
-            
-        except jwt.PyJWTError as e:
-            logger.warning(f"Invalid token: {str(e)}")
-            
-            return JSONResponse(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                content={
-                    "status": "error",
-                    "code": "unauthorized",
-                    "message": "Authentication required",
-                    "details": "Invalid or expired token"
-                },
-                headers={"WWW-Authenticate": "Bearer"}
-            )
+        finally:
+            db.close()

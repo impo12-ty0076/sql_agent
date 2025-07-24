@@ -149,7 +149,8 @@ const ApiKeyForm: React.FC<ApiKeyFormProps> = ({ initialValues, onSubmit, onCanc
             }
           >
             <Typography variant="subtitle2">
-              API Key created successfully. Please copy this key now as it won't be shown again:
+              API Key created successfully. Please copy this key now as it won&apos;t be shown
+              again:
             </Typography>
             <Box
               sx={{
@@ -209,14 +210,9 @@ const ApiKeyForm: React.FC<ApiKeyFormProps> = ({ initialValues, onSubmit, onCanc
               <DatePicker
                 label="Expiry Date (Optional)"
                 value={expiryDate || null}
-                onChange={handleExpiryDateChange}
+                onChange={value => handleExpiryDateChange(value as Date | null)}
                 disabled={loading || !!newKey}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    margin: 'normal',
-                  },
-                }}
+                renderInput={params => <TextField {...params} fullWidth margin="normal" />}
               />
             </LocalizationProvider>
           </Grid>

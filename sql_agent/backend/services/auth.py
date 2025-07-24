@@ -98,6 +98,7 @@ class AuthService:
             return False
             
         session.is_active = False
+        session.expires_at = datetime.utcnow()
         db.commit()
         
         return True

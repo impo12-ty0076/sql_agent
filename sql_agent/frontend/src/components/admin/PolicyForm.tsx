@@ -94,7 +94,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
   const handleRemoveBlockedKeyword = (keyword: string) => {
     setSettings({
       ...settings,
-      blockedKeywords: settings.blockedKeywords.filter((k) => k !== keyword),
+      blockedKeywords: settings.blockedKeywords.filter(k => k !== keyword),
     });
   };
 
@@ -110,7 +110,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
   const handleRemoveQueryType = (queryType: string) => {
     setSettings({
       ...settings,
-      allowedQueryTypes: settings.allowedQueryTypes.filter((t) => t !== queryType),
+      allowedQueryTypes: settings.allowedQueryTypes.filter(t => t !== queryType),
     });
   };
 
@@ -127,7 +127,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
             fullWidth
             label="Policy Name"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={e => setName(e.target.value)}
             error={!!errors.name}
             helperText={errors.name}
             required
@@ -138,7 +138,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
             fullWidth
             label="Description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={e => setDescription(e.target.value)}
             error={!!errors.description}
             helperText={errors.description}
             multiline
@@ -159,7 +159,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
             label="Max Queries Per Day"
             type="number"
             value={settings.maxQueriesPerDay}
-            onChange={(e) =>
+            onChange={e =>
               setSettings({
                 ...settings,
                 maxQueriesPerDay: parseInt(e.target.value) || 0,
@@ -178,7 +178,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
             label="Max Query Execution Time (seconds)"
             type="number"
             value={settings.maxQueryExecutionTime}
-            onChange={(e) =>
+            onChange={e =>
               setSettings({
                 ...settings,
                 maxQueryExecutionTime: parseInt(e.target.value) || 0,
@@ -197,7 +197,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
             label="Max Result Size (rows)"
             type="number"
             value={settings.maxResultSize}
-            onChange={(e) =>
+            onChange={e =>
               setSettings({
                 ...settings,
                 maxResultSize: parseInt(e.target.value) || 0,
@@ -220,7 +220,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
               fullWidth
               label="Add Query Type"
               value={newQueryType}
-              onChange={(e) => setNewQueryType(e.target.value)}
+              onChange={e => setNewQueryType(e.target.value)}
               placeholder="e.g., SELECT, SHOW"
               size="small"
               InputProps={{
@@ -235,7 +235,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
             />
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {settings.allowedQueryTypes.map((queryType) => (
+            {settings.allowedQueryTypes.map(queryType => (
               <Chip
                 key={queryType}
                 label={queryType}
@@ -260,7 +260,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
               fullWidth
               label="Add Blocked Keyword"
               value={newKeyword}
-              onChange={(e) => setNewKeyword(e.target.value)}
+              onChange={e => setNewKeyword(e.target.value)}
               placeholder="e.g., DROP, DELETE"
               size="small"
               InputProps={{
@@ -275,7 +275,7 @@ const PolicyForm: React.FC<PolicyFormProps> = ({ policy, onSave, onCancel }) => 
             />
           </Box>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {settings.blockedKeywords.map((keyword) => (
+            {settings.blockedKeywords.map(keyword => (
               <Chip
                 key={keyword}
                 label={keyword}

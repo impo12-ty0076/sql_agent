@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  Box, 
-  Typography, 
-  Divider, 
-  Button, 
-  TextField, 
-  Chip, 
+import {
+  Box,
+  Typography,
+  Divider,
+  Button,
+  TextField,
+  Chip,
   IconButton,
   Paper,
   Tabs,
@@ -15,7 +15,7 @@ import {
   CircularProgress,
   Autocomplete,
   Snackbar,
-  Alert
+  Alert,
 } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -28,12 +28,12 @@ import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 import { AppDispatch, RootState } from '../../store';
-import { 
-  QueryHistoryItem, 
-  toggleFavorite, 
-  updateTags, 
+import {
+  QueryHistoryItem,
+  toggleFavorite,
+  updateTags,
   updateHistoryItem,
-  getShareLinks
+  getShareLinks,
 } from '../../services/historyService';
 import api from '../../services/api';
 import { QueryDetailsResponse, TagsResponse } from '../../types/api';
@@ -62,11 +62,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
       style={{ height: 'calc(100% - 48px)', overflow: 'auto' }}
     >
-      {value === index && (
-        <Box sx={{ p: 2, height: '100%' }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 2, height: '100%' }}>{children}</Box>}
     </div>
   );
 }
@@ -79,7 +75,15 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
   const [editingTags, setEditingTags] = useState(false);
   const [tags, setTags] = useState<string[]>(item.tags || []);
   const [availableTags, setAvailableTags] = useState<string[]>([
-    '중요', '보고서', '매출', '고객', '제품', '분석', '월간', '분기', '연간'
+    '중요',
+    '보고서',
+    '매출',
+    '고객',
+    '제품',
+    '분석',
+    '월간',
+    '분기',
+    '연간',
   ]); // 실제로는 API에서 가져와야 함
   const [queryDetails, setQueryDetails] = useState<QueryDetailsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -88,11 +92,11 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
-  
+
   useEffect(() => {
     setNotes(item.notes || '');
     setTags(item.tags || []);
-    
+
     // Fetch query details when item changes
     const fetchQueryDetails = async () => {
       setLoading(true);
@@ -106,7 +110,7 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
         setLoading(false);
       }
     };
-    
+
     // Fetch available tags
     const fetchAvailableTags = async () => {
       try {
@@ -118,36 +122,40 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
         console.error('Failed to fetch available tags:', err);
       }
     };
-    
+
     fetchQueryDetails();
     fetchAvailableTags();
   }, [item]);
-  
+
   const handleToggleFavorite = () => {
     dispatch(toggleFavorite({ historyId: item.id, favorite: !item.favorite }));
   };
-  
+
   const handleSaveNotes = () => {
-    dispatch(updateHistoryItem({ 
-      historyId: item.id, 
-      data: { notes } 
-    }));
+    dispatch(
+      updateHistoryItem({
+        historyId: item.id,
+        data: { notes },
+      })
+    );
     setEditingNotes(false);
     showSnackbar('메모가 저장되었습니다.', 'success');
   };
-  
+
   const handleSaveTags = () => {
-    dispatch(updateTags({ 
-      historyId: item.id, 
-      tags 
-    }));
+    dispatch(
+      updateTags({
+        historyId: item.id,
+        tags,
+      })
+    );
     setEditingTags(false);
     showSnackbar('태그가 저장되었습니다.', 'success');
   };
-  
+
   const handleRerunQuery = async () => {
     if (!queryDetails) return;
-    
+
     try {
       // Navigate to query page and set the query
       // This is a placeholder - actual implementation would depend on your app's routing and state management
@@ -157,42 +165,40 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
       showSnackbar('쿼리 재실행에 실패했습니다.', 'error');
     }
   };
-  
+
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-  
-  const shareLinks = useSelector((state: RootState) => 
-    state.history.shareLinks[item.id] || []
-  );
+
+  const shareLinks = useSelector((state: RootState) => state.history.shareLinks[item.id] || []);
   const shareLinksLoading = useSelector((state: RootState) => state.history.shareLinksLoading);
   const shareLinksError = useSelector((state: RootState) => state.history.shareLinksError);
-  
+
   useEffect(() => {
     // Fetch share links for this history item
     dispatch(getShareLinks(item.id));
   }, [dispatch, item.id]);
-  
+
   const handleShareQuery = () => {
     setShareDialogOpen(true);
   };
-  
+
   const handleCloseShareDialog = () => {
     setShareDialogOpen(false);
     // Refresh share links after dialog closes
     dispatch(getShareLinks(item.id));
   };
-  
+
   const showSnackbar = (message: string, severity: 'success' | 'error') => {
     setSnackbarMessage(message);
     setSnackbarSeverity(severity);
     setSnackbarOpen(true);
   };
-  
+
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
-  
+
   const handleRemoveTag = (tagToRemove: string) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
   };
@@ -203,20 +209,23 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
         <Typography variant="h6" component="h2">
           쿼리 상세 정보
         </Typography>
-        
+
         <Box sx={{ display: 'flex', gap: 1 }}>
-          <Tooltip title={item.favorite ? "즐겨찾기 해제" : "즐겨찾기 추가"}>
-            <IconButton onClick={handleToggleFavorite} color={item.favorite ? "warning" : "default"}>
+          <Tooltip title={item.favorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}>
+            <IconButton
+              onClick={handleToggleFavorite}
+              color={item.favorite ? 'warning' : 'default'}
+            >
               {item.favorite ? <StarIcon /> : <StarBorderIcon />}
             </IconButton>
           </Tooltip>
-          
+
           <Tooltip title="공유">
             <IconButton onClick={handleShareQuery} color="primary">
               <ShareIcon />
             </IconButton>
           </Tooltip>
-          
+
           <Button
             variant="contained"
             color="primary"
@@ -228,18 +237,19 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
           </Button>
         </Box>
       </Box>
-      
+
       <Divider sx={{ mb: 2 }} />
-      
+
       <Box sx={{ mb: 2 }}>
         <Typography variant="body2" color="text.secondary">
           생성일: {format(new Date(item.created_at), 'yyyy년 MM월 dd일 HH:mm:ss', { locale: ko })}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          마지막 수정일: {format(new Date(item.updated_at), 'yyyy년 MM월 dd일 HH:mm:ss', { locale: ko })}
+          마지막 수정일:{' '}
+          {format(new Date(item.updated_at), 'yyyy년 MM월 dd일 HH:mm:ss', { locale: ko })}
         </Typography>
       </Box>
-      
+
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="subtitle1">태그</Typography>
@@ -252,22 +262,23 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
               <IconButton size="small" onClick={handleSaveTags} color="primary">
                 <SaveIcon fontSize="small" />
               </IconButton>
-              <IconButton size="small" onClick={() => {
-                setEditingTags(false);
-                setTags(item.tags || []);
-              }}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setEditingTags(false);
+                  setTags(item.tags || []);
+                }}
+              >
                 <CancelIcon fontSize="small" />
               </IconButton>
             </Box>
           )}
         </Box>
-        
+
         {!editingTags ? (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
             {item.tags.length > 0 ? (
-              item.tags.map((tag) => (
-                <Chip key={tag} label={tag} size="small" />
-              ))
+              item.tags.map(tag => <Chip key={tag} label={tag} size="small" />)
             ) : (
               <Typography variant="body2" color="text.secondary">
                 태그 없음
@@ -277,13 +288,8 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
         ) : (
           <Box>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1 }}>
-              {tags.map((tag) => (
-                <Chip 
-                  key={tag} 
-                  label={tag} 
-                  size="small" 
-                  onDelete={() => handleRemoveTag(tag)} 
-                />
+              {tags.map(tag => (
+                <Chip key={tag} label={tag} size="small" onDelete={() => handleRemoveTag(tag)} />
               ))}
             </Box>
             <Autocomplete
@@ -301,7 +307,7 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
                   }
                 }
               }}
-              renderInput={(params) => (
+              renderInput={params => (
                 <TextField
                   {...params}
                   variant="outlined"
@@ -314,7 +320,7 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
           </Box>
         )}
       </Box>
-      
+
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
           <Typography variant="subtitle1">메모</Typography>
@@ -327,16 +333,19 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
               <IconButton size="small" onClick={handleSaveNotes} color="primary">
                 <SaveIcon fontSize="small" />
               </IconButton>
-              <IconButton size="small" onClick={() => {
-                setEditingNotes(false);
-                setNotes(item.notes || '');
-              }}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setEditingNotes(false);
+                  setNotes(item.notes || '');
+                }}
+              >
                 <CancelIcon fontSize="small" />
               </IconButton>
             </Box>
           )}
         </Box>
-        
+
         {!editingNotes ? (
           <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
             {item.notes || '메모 없음'}
@@ -346,26 +355,26 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
             multiline
             rows={4}
             value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            onChange={e => setNotes(e.target.value)}
             fullWidth
             placeholder="메모를 입력하세요"
           />
         )}
       </Box>
-      
+
       <Divider sx={{ mb: 2 }} />
-      
+
       <Box sx={{ mb: 2 }}>
-        <SharedQueriesList 
+        <SharedQueriesList
           historyId={item.id}
           shareLinks={shareLinks}
           loading={shareLinksLoading}
           error={shareLinksError}
         />
       </Box>
-      
+
       <Divider sx={{ mb: 2 }} />
-      
+
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="query details tabs">
@@ -374,13 +383,17 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
             <Tab label="결과" id="history-tab-2" aria-controls="history-tabpanel-2" />
           </Tabs>
         </Box>
-        
+
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+          >
             <CircularProgress />
           </Box>
         ) : error ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Box
+            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}
+          >
             <Typography color="error">{error}</Typography>
           </Box>
         ) : (
@@ -396,17 +409,17 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
                 </Typography>
               )}
             </TabPanel>
-            
+
             <TabPanel value={tabValue} index={1}>
               {queryDetails?.generated_sql ? (
-                <Paper 
-                  variant="outlined" 
-                  sx={{ 
-                    p: 2, 
-                    bgcolor: 'grey.100', 
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    bgcolor: 'grey.100',
                     fontFamily: 'monospace',
                     whiteSpace: 'pre-wrap',
-                    overflowX: 'auto'
+                    overflowX: 'auto',
                   }}
                 >
                   {queryDetails.generated_sql}
@@ -417,7 +430,7 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
                 </Typography>
               )}
             </TabPanel>
-            
+
             <TabPanel value={tabValue} index={2}>
               {queryDetails?.result ? (
                 <Box sx={{ height: '100%', overflow: 'auto' }}>
@@ -435,20 +448,24 @@ const HistoryDetail: React.FC<HistoryDetailProps> = ({ item }) => {
           </>
         )}
       </Box>
-      
+
       {/* 공유 다이얼로그 */}
-      <ShareQueryDialog 
-        open={shareDialogOpen} 
-        onClose={handleCloseShareDialog} 
+      <ShareQueryDialog
+        open={shareDialogOpen}
+        onClose={handleCloseShareDialog}
         historyId={item.id}
-        existingShareLink={shareLinks.length > 0 ? {
-          id: shareLinks[0].id,
-          link: shareLinks[0].share_link,
-          expiresAt: shareLinks[0].expires_at,
-          allowedUsers: shareLinks[0].allowed_users
-        } : undefined}
+        existingShareLink={
+          shareLinks.length > 0
+            ? {
+                id: shareLinks[0].id,
+                link: shareLinks[0].share_link,
+                expiresAt: shareLinks[0].expires_at,
+                allowedUsers: shareLinks[0].allowed_users,
+              }
+            : undefined
+        }
       />
-      
+
       {/* 알림 스낵바 */}
       <Snackbar
         open={snackbarOpen}

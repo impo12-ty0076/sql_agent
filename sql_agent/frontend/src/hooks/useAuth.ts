@@ -33,12 +33,12 @@ export const useAuth = () => {
   const updateProfile = useCallback(
     async (userData: Partial<User>) => {
       if (!user) return { success: false, error: 'User not authenticated' };
-      
+
       const updatedUser = {
         ...user,
         ...userData,
       };
-      
+
       return await dispatch(authService.updateProfile(updatedUser) as any);
     },
     [dispatch, user]

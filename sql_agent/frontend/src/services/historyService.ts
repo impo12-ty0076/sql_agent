@@ -71,7 +71,7 @@ export const fetchQueryHistory = createAsyncThunk(
   async (filters: QueryHistoryFilters, { rejectWithValue }) => {
     try {
       const params = new URLSearchParams();
-      
+
       if (filters.limit) params.append('limit', filters.limit.toString());
       if (filters.offset) params.append('offset', filters.offset.toString());
       if (filters.favorite_only) params.append('favorite_only', filters.favorite_only.toString());
@@ -81,8 +81,10 @@ export const fetchQueryHistory = createAsyncThunk(
       if (filters.start_date) params.append('start_date', filters.start_date);
       if (filters.end_date) params.append('end_date', filters.end_date);
       if (filters.search_text) params.append('search_text', filters.search_text);
-      
-      const response = await api.get<QueryHistoryListResponse>(`/api/query-history/?${params.toString()}`);
+
+      const response = await api.get<QueryHistoryListResponse>(
+        `/api/query-history/?${params.toString()}`
+      );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: error.message });
@@ -92,7 +94,10 @@ export const fetchQueryHistory = createAsyncThunk(
 
 export const updateHistoryItem = createAsyncThunk(
   'history/updateHistoryItem',
-  async ({ historyId, data }: { historyId: string; data: QueryHistoryUpdate }, { rejectWithValue }) => {
+  async (
+    { historyId, data }: { historyId: string; data: QueryHistoryUpdate },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await api.put<QueryHistoryItem>(`/api/query-history/${historyId}`, data);
       return response.data;
@@ -104,9 +109,15 @@ export const updateHistoryItem = createAsyncThunk(
 
 export const toggleFavorite = createAsyncThunk(
   'history/toggleFavorite',
-  async ({ historyId, favorite }: { historyId: string; favorite: boolean }, { rejectWithValue }) => {
+  async (
+    { historyId, favorite }: { historyId: string; favorite: boolean },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await api.post<QueryHistoryItem>(`/api/query-history/favorite/${historyId}`, { favorite });
+      const response = await api.post<QueryHistoryItem>(
+        `/api/query-history/favorite/${historyId}`,
+        { favorite }
+      );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: error.message });
@@ -118,7 +129,9 @@ export const updateTags = createAsyncThunk(
   'history/updateTags',
   async ({ historyId, tags }: { historyId: string; tags: string[] }, { rejectWithValue }) => {
     try {
-      const response = await api.post<QueryHistoryItem>(`/api/query-history/tags/${historyId}`, { tags });
+      const response = await api.post<QueryHistoryItem>(`/api/query-history/tags/${historyId}`, {
+        tags,
+      });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: error.message });
@@ -146,7 +159,7 @@ export const createShareLink = createAsyncThunk(
       const response = await api.post<ShareLinkResponse>('/api/query-history/share', {
         history_id: request.historyId,
         expires_in_days: request.expiresInDays,
-        allowed_users: request.allowedUsers
+        allowed_users: request.allowedUsers,
       });
       return response.data;
     } catch (error: any) {
@@ -159,10 +172,13 @@ export const updateShareLink = createAsyncThunk(
   'history/updateShareLink',
   async (request: UpdateShareLinkRequest, { rejectWithValue }) => {
     try {
-      const response = await api.put<ShareLinkResponse>(`/api/query-history/share/${request.shareId}`, {
-        expires_in_days: request.expiresInDays,
-        allowed_users: request.allowedUsers
-      });
+      const response = await api.put<ShareLinkResponse>(
+        `/api/query-history/share/${request.shareId}`,
+        {
+          expires_in_days: request.expiresInDays,
+          allowed_users: request.allowedUsers,
+        }
+      );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: error.message });
@@ -186,7 +202,9 @@ export const getShareLinks = createAsyncThunk(
   'history/getShareLinks',
   async (historyId: string, { rejectWithValue }) => {
     try {
-      const response = await api.get<{ items: ShareLink[] }>(`/api/query-history/${historyId}/shares`);
+      const response = await api.get<{ items: ShareLink[] }>(
+        `/api/query-history/${historyId}/shares`
+      );
       return response.data.items;
     } catch (error: any) {
       return rejectWithValue(error.response?.data || { message: error.message });
@@ -204,7 +222,7 @@ const historyService = {
   createShareLink,
   updateShareLink,
   deleteShareLink,
-  getShareLinks
+  getShareLinks,
 };
 
 export default historyService;

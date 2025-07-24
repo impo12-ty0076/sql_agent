@@ -31,7 +31,9 @@ const PolicyDetail: React.FC = () => {
     };
   }, [dispatch, policyId, isNewPolicy]);
 
-  const handleSave = async (policy: Omit<Policy, 'id' | 'createdAt' | 'updatedAt' | 'appliedToUsers'>) => {
+  const handleSave = async (
+    policy: Omit<Policy, 'id' | 'createdAt' | 'updatedAt' | 'appliedToUsers'>
+  ) => {
     try {
       if (isNewPolicy) {
         await dispatch(createPolicy(policy) as any);
@@ -96,7 +98,7 @@ const PolicyDetail: React.FC = () => {
       )}
 
       <PolicyForm
-        policy={isNewPolicy ? undefined : (selectedPolicy || undefined)}
+        policy={isNewPolicy ? undefined : selectedPolicy || undefined}
         onSave={handleSave}
         onCancel={handleCancel}
       />

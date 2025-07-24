@@ -21,10 +21,10 @@ describe('HistoryFilters', () => {
           offset: 0,
           favorite_only: false,
           tags: [],
-        }
-      }
+        },
+      },
     });
-    
+
     store.dispatch = jest.fn();
   });
 
@@ -40,7 +40,7 @@ describe('HistoryFilters', () => {
 
   test('renders filter components correctly', () => {
     renderComponent();
-    
+
     expect(screen.getByText('필터')).toBeInTheDocument();
     expect(screen.getByLabelText('시작일')).toBeInTheDocument();
     expect(screen.getByLabelText('종료일')).toBeInTheDocument();
@@ -52,18 +52,18 @@ describe('HistoryFilters', () => {
 
   test('applies filters when Apply button is clicked', () => {
     renderComponent();
-    
+
     // Check favorite only
     fireEvent.click(screen.getByLabelText('즐겨찾기만 보기'));
-    
+
     // Add search text
     fireEvent.change(screen.getByPlaceholderText('쿼리 내용, 메모 검색'), {
-      target: { value: '매출 데이터' }
+      target: { value: '매출 데이터' },
     });
-    
+
     // Click apply button
     fireEvent.click(screen.getByText('적용'));
-    
+
     // Check if setFilters action was dispatched with correct parameters
     expect(store.dispatch).toHaveBeenCalledWith(
       setFilters({
@@ -78,10 +78,10 @@ describe('HistoryFilters', () => {
 
   test('resets filters when Reset button is clicked', () => {
     renderComponent();
-    
+
     // Click reset button
     fireEvent.click(screen.getByText('초기화'));
-    
+
     // Check if resetFilters action was dispatched
     expect(store.dispatch).toHaveBeenCalledWith(resetFilters());
   });

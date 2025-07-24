@@ -57,8 +57,12 @@ const UserDetail: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { selectedUser, loading: userLoading } = useSelector((state: RootState) => state.admin.users);
-  const { data: databases, loading: dbLoading } = useSelector((state: RootState) => state.admin.databases);
+  const { selectedUser, loading: userLoading } = useSelector(
+    (state: RootState) => state.admin.users
+  );
+  const { data: databases, loading: dbLoading } = useSelector(
+    (state: RootState) => state.admin.databases
+  );
   const [tabValue, setTabValue] = useState(0);
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [roleUpdating, setRoleUpdating] = useState(false);
@@ -82,7 +86,7 @@ const UserDetail: React.FC = () => {
 
   const handleStatusChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
     if (!selectedUser) return;
-    
+
     const newStatus = event.target.value as 'active' | 'inactive' | 'suspended';
     setStatusUpdating(true);
     try {
@@ -96,7 +100,7 @@ const UserDetail: React.FC = () => {
 
   const handleRoleChange = async (event: React.ChangeEvent<{ value: unknown }>) => {
     if (!selectedUser) return;
-    
+
     const newRole = event.target.value as 'user' | 'admin';
     setRoleUpdating(true);
     try {
@@ -110,7 +114,7 @@ const UserDetail: React.FC = () => {
 
   const handlePermissionsUpdate = async (permissions: UserPermissions) => {
     if (!selectedUser) return;
-    
+
     setPermissionsUpdating(true);
     try {
       await dispatch(updateUserPermissions({ userId: selectedUser.id, permissions }) as any);

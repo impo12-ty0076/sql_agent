@@ -1,6 +1,15 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Grid, Container, Typography, Box, Divider, Button, Card, CardContent } from '@mui/material';
+import {
+  Grid,
+  Container,
+  Typography,
+  Box,
+  Divider,
+  Button,
+  Card,
+  CardContent,
+} from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import PeopleIcon from '@mui/icons-material/People';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
@@ -29,14 +38,9 @@ import { LogFilter } from '../../services/adminService';
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch();
-  const {
-    stats,
-    status,
-    logs,
-    usageStats,
-    errorStats,
-    performanceMetrics,
-  } = useSelector((state: RootState) => state.admin);
+  const { stats, status, logs, usageStats, errorStats, performanceMetrics } = useSelector(
+    (state: RootState) => state.admin
+  );
 
   useEffect(() => {
     // Fetch initial data
@@ -147,11 +151,7 @@ const AdminDashboard: React.FC = () => {
             />
           </Grid>
           <Grid item xs={12} sm={6} md={6}>
-            <SystemStatusCard
-              status={status.data}
-              loading={status.loading}
-              error={status.error}
-            />
+            <SystemStatusCard status={status.data} loading={status.loading} error={status.error} />
           </Grid>
         </Grid>
       </Box>
@@ -217,12 +217,13 @@ const AdminDashboard: React.FC = () => {
                   <Typography variant="h6">User Management</Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  Manage users, roles, and database access permissions. Control who can access the system and what they can do.
+                  Manage users, roles, and database access permissions. Control who can access the
+                  system and what they can do.
                 </Typography>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  component={RouterLink} 
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component={RouterLink}
                   to="/admin/users"
                   startIcon={<PeopleIcon />}
                 >
@@ -239,12 +240,13 @@ const AdminDashboard: React.FC = () => {
                   <Typography variant="h6">Policy Management</Typography>
                 </Box>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                  Create and manage query limit policies. Set restrictions on query execution time, result size, and allowed query types.
+                  Create and manage query limit policies. Set restrictions on query execution time,
+                  result size, and allowed query types.
                 </Typography>
-                <Button 
-                  variant="contained" 
-                  color="primary" 
-                  component={RouterLink} 
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component={RouterLink}
                   to="/admin/policies"
                   startIcon={<SecurityIcon />}
                 >

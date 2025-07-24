@@ -17,7 +17,7 @@ const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ status, loading, er
     const days = Math.floor(seconds / (3600 * 24));
     const hours = Math.floor((seconds % (3600 * 24)) / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     return `${days}d ${hours}h ${minutes}m`;
   };
 
@@ -97,7 +97,7 @@ const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ status, loading, er
             size="small"
           />
         </Box>
-        
+
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2" color="text.secondary">
@@ -109,16 +109,14 @@ const SystemStatusCard: React.FC<SystemStatusCardProps> = ({ status, loading, er
             <Typography variant="subtitle2" color="text.secondary">
               Last Checked
             </Typography>
-            <Typography variant="body1">
-              {new Date(status.lastChecked).toLocaleString()}
-            </Typography>
+            <Typography variant="body1">{new Date(status.lastChecked).toLocaleString()}</Typography>
           </Grid>
         </Grid>
-        
+
         <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2, mb: 1 }}>
           Component Status
         </Typography>
-        
+
         <Grid container spacing={1}>
           {Object.entries(status.components).map(([component, componentStatus]) => (
             <Grid item xs={6} sm={3} key={component}>

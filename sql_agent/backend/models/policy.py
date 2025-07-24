@@ -94,7 +94,7 @@ class PolicyResponse(PolicyBase):
     created_by: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PolicyFilterParams(BaseModel):

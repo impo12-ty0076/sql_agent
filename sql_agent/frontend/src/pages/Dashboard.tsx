@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Paper, 
-  Tabs, 
-  Tab, 
-  Alert, 
+import {
+  Container,
+  Typography,
+  Box,
+  Paper,
+  Tabs,
+  Tab,
+  Alert,
   Divider,
   Grid,
   Card,
   CardContent,
-  Skeleton
+  Skeleton,
 } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
@@ -50,7 +50,11 @@ function TabPanel(props: TabPanelProps) {
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { selectedDatabase, loading: dbLoading, error: dbError } = useSelector((state: RootState) => state.db);
+  const {
+    selectedDatabase,
+    loading: dbLoading,
+    error: dbError,
+  } = useSelector((state: RootState) => state.db);
   const { reportGenerationStatus } = useSelector((state: RootState) => state.report);
   const [tabValue, setTabValue] = useState(0);
   const [queryResult, setQueryResult] = useState<any>(null);
@@ -81,7 +85,7 @@ const Dashboard: React.FC = () => {
 
   const handleQueryComplete = (result: SqlExecutionResult) => {
     if (!result) return;
-    
+
     setQueryError(null);
     setQueryResult({
       columns: result.columns,
@@ -91,17 +95,18 @@ const Dashboard: React.FC = () => {
       pageSize: 10,
       executionTime: result.executionTime,
       truncated: result.truncated,
-      totalRowCount: result.totalRowCount
+      totalRowCount: result.totalRowCount,
     });
-    
+
     // If report generation is enabled, generate a report
     if (reportGenerationEnabled && result.rowCount > 0) {
-      dispatch(reportService.generateReport(
-        result.resultId || 'temp-result-id', // In a real app, we'd have a proper resultId
-        reportGenerationOptions.visualizationTypes,
-        reportGenerationOptions.includeInsights
-      ))
-      .catch((error) => {
+      dispatch(
+        reportService.generateReport(
+          result.resultId || 'temp-result-id', // In a real app, we'd have a proper resultId
+          reportGenerationOptions.visualizationTypes,
+          reportGenerationOptions.includeInsights
+        )
+      ).catch(error => {
         setQueryError(`리포트 생성 오류: ${error.message}`);
       });
     }
@@ -116,7 +121,7 @@ const Dashboard: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         SQL DB LLM Agent
       </Typography>
-      
+
       <Grid container spacing={3}>
         <Grid item xs={12}>
           <Paper sx={{ p: 3, mb: 3 }}>
@@ -124,44 +129,46 @@ const Dashboard: React.FC = () => {
               대시보드
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              자연어로 데이터베이스에 질의하고 결과를 분석하세요. 시작하려면 먼저 데이터베이스를 선택하고 연결하세요.
+              자연어로 데이터베이스에 질의하고 결과를 분석하세요. 시작하려면 먼저 데이터베이스를
+              선택하고 연결하세요.
             </Typography>
-            
+
             <Divider sx={{ my: 2 }} />
-            
+
             <DatabaseSelector />
             <ConnectionStatus />
           </Paper>
         </Grid>
-        
+
         <Grid item xs={12}>
           {dbError && (
             <Alert severity="error" sx={{ mb: 3 }}>
               {dbError}
             </Alert>
           )}
-          
+
           {queryError && (
             <Alert severity="error" sx={{ mb: 3 }}>
               {queryError}
             </Alert>
           )}
-          
+
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom>
               자연어 질의
             </Typography>
-            <NaturalLanguageQueryInput 
+            <NaturalLanguageQueryInput
               onQueryComplete={handleQueryComplete}
               disabled={!selectedDatabase?.connected}
-              placeholder={selectedDatabase?.connected 
-                ? "자연어로 질문하세요 (예: '모든 사용자의 이름과 이메일을 보여줘')" 
-                : "질의하려면 먼저 데이터베이스에 연결하세요"
+              placeholder={
+                selectedDatabase?.connected
+                  ? "자연어로 질문하세요 (예: '모든 사용자의 이름과 이메일을 보여줘')"
+                  : '질의하려면 먼저 데이터베이스에 연결하세요'
               }
             />
           </Paper>
         </Grid>
-        
+
         {dbLoading && !queryResult && (
           <Grid item xs={12}>
             <Card>
@@ -172,7 +179,7 @@ const Dashboard: React.FC = () => {
             </Card>
           </Grid>
         )}
-        
+
         {queryResult && (
           <Grid item xs={12}>
             <Paper sx={{ mb: 3 }}>
@@ -181,7 +188,7 @@ const Dashboard: React.FC = () => {
                 <Tab label="요약" />
                 <Tab label="리포트" />
               </Tabs>
-              
+
               <TabPanel value={tabValue} index={0}>
                 <ResultTable
                   columns={queryResult.columns}
@@ -193,13 +200,14 @@ const Dashboard: React.FC = () => {
                   onPageSizeChange={setPageSize}
                 />
               </TabPanel>
-              
+
               <TabPanel value={tabValue} index={1}>
                 <Typography variant="body1">
-                  총 2명의 사용자가 조회되었습니다. 사용자 ID, 사용자명, 이메일 정보가 포함되어 있습니다.
+                  총 2명의 사용자가 조회되었습니다. 사용자 ID, 사용자명, 이메일 정보가 포함되어
+                  있습니다.
                 </Typography>
               </TabPanel>
-              
+
               <TabPanel value={tabValue} index={2}>
                 <ReportToggle />
                 <ReportProgress />

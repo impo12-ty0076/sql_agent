@@ -24,6 +24,7 @@ def main():
         sys.executable, "-m", "uvicorn", 
         "sql_agent.backend.main:app", 
         "--reload",
+        "--reload-dir", "sql_agent/backend",
         "--host", "0.0.0.0",
         "--port", "8000"
     ]

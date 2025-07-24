@@ -11,23 +11,30 @@ const sampleColumns = [
   { name: '직급', type: 'string' },
   { name: '입사일', type: 'date' },
   { name: '급여', type: 'number' },
-  { name: '설명', type: 'text' }
+  { name: '설명', type: 'text' },
 ];
 
 const generateSampleData = (count: number) => {
   const departments = ['개발팀', '마케팅팀', '영업팀', '인사팀', '재무팀'];
   const positions = ['사원', '대리', '과장', '차장', '부장'];
-  
-  return Array(count).fill(null).map((_, i) => [
-    i + 1,
-    `사용자 ${i + 1}`,
-    `user${i + 1}@example.com`,
-    departments[i % departments.length],
-    positions[i % positions.length],
-    `${2020 - (i % 10)}-${String(i % 12 + 1).padStart(2, '0')}-${String(i % 28 + 1).padStart(2, '0')}`,
-    50000000 + (i * 1000000),
-    `이 사용자는 ${departments[i % departments.length]}의 ${positions[i % positions.length]}이며, 다양한 프로젝트에 참여하고 있습니다. 이 설명은 긴 텍스트 처리 기능을 테스트하기 위한 예시입니다.`
-  ]);
+
+  return Array(count)
+    .fill(null)
+    .map((_, i) => [
+      i + 1,
+      `사용자 ${i + 1}`,
+      `user${i + 1}@example.com`,
+      departments[i % departments.length],
+      positions[i % positions.length],
+      `${2020 - (i % 10)}-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(
+        2,
+        '0'
+      )}`,
+      50000000 + i * 1000000,
+      `이 사용자는 ${departments[i % departments.length]}의 ${
+        positions[i % positions.length]
+      }이며, 다양한 프로젝트에 참여하고 있습니다. 이 설명은 긴 텍스트 처리 기능을 테스트하기 위한 예시입니다.`,
+    ]);
 };
 
 const ResultTableExample: React.FC = () => {
@@ -35,12 +42,12 @@ const ResultTableExample: React.FC = () => {
   const [error, setError] = useState<string | undefined>(undefined);
   const [rows, setRows] = useState(() => generateSampleData(20));
   const [rowCount, setRowCount] = useState(20);
-  
+
   // 데이터 새로고침 핸들러
   const handleRefresh = () => {
     setLoading(true);
     setError(undefined);
-    
+
     // 실제 애플리케이션에서는 API 호출 등을 수행
     setTimeout(() => {
       try {
@@ -54,12 +61,12 @@ const ResultTableExample: React.FC = () => {
       }
     }, 1000);
   };
-  
+
   // 대용량 데이터 로드 핸들러
   const handleLoadLargeData = () => {
     setLoading(true);
     setError(undefined);
-    
+
     setTimeout(() => {
       try {
         const newData = generateSampleData(100);
@@ -72,24 +79,24 @@ const ResultTableExample: React.FC = () => {
       }
     }, 1500);
   };
-  
+
   // 오류 시뮬레이션 핸들러
   const handleSimulateError = () => {
     setError('테스트 오류 메시지입니다.');
   };
-  
+
   // 행 클릭 핸들러
   const handleRowClick = (row: any[], rowIndex: number) => {
     console.log(`Row ${rowIndex} clicked:`, row);
     alert(`${rowIndex + 1}번 행 클릭: ${row[1]} (${row[2]})`);
   };
-  
+
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
         쿼리 결과 표시 컴포넌트 예제
       </Typography>
-      
+
       <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
         <Button variant="contained" onClick={handleRefresh}>
           데이터 새로고침
@@ -101,7 +108,7 @@ const ResultTableExample: React.FC = () => {
           오류 시뮬레이션
         </Button>
       </Box>
-      
+
       <EnhancedResultTable
         columns={sampleColumns}
         rows={rows}

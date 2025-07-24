@@ -64,12 +64,7 @@ describe('UserTable Component', () => {
   test('renders loading state', () => {
     render(
       <BrowserRouter>
-        <UserTable
-          users={[]}
-          loading={true}
-          filter={{}}
-          onFilterChange={mockFilterChange}
-        />
+        <UserTable users={[]} loading={true} filter={{}} onFilterChange={mockFilterChange} />
       </BrowserRouter>
     );
 
@@ -79,12 +74,7 @@ describe('UserTable Component', () => {
   test('renders empty state', () => {
     render(
       <BrowserRouter>
-        <UserTable
-          users={[]}
-          loading={false}
-          filter={{}}
-          onFilterChange={mockFilterChange}
-        />
+        <UserTable users={[]} loading={false} filter={{}} onFilterChange={mockFilterChange} />
       </BrowserRouter>
     );
 
@@ -105,7 +95,7 @@ describe('UserTable Component', () => {
 
     const searchInput = screen.getByLabelText('Search Users');
     fireEvent.change(searchInput, { target: { value: 'admin' } });
-    
+
     expect(mockFilterChange).toHaveBeenCalledWith({ searchTerm: 'admin' });
   });
 });

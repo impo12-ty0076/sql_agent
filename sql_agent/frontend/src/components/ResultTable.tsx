@@ -85,7 +85,7 @@ const ResultTable: React.FC<ResultTableProps> = ({
         page={page}
         onPageChange={(_, newPage) => onPageChange(newPage)}
         rowsPerPage={pageSize}
-        onRowsPerPageChange={(e) => onPageSizeChange(parseInt(e.target.value, 10))}
+        onRowsPerPageChange={e => onPageSizeChange(parseInt(e.target.value, 10))}
         rowsPerPageOptions={[10, 25, 50, 100]}
       />
     </Paper>

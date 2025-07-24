@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Typography, Box, Divider, Dialog, DialogTitle, DialogContent, DialogActions, Button, Alert } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Box,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Alert,
+} from '@mui/material';
 import { RootState } from '../../store';
 import { fetchPolicies, setPolicyFilter, deletePolicy } from '../../store/slices/adminSlice';
 import PolicyTable from '../../components/admin/PolicyTable';
@@ -8,7 +19,11 @@ import { PolicyFilter } from '../../types/admin';
 
 const PolicyManagement: React.FC = () => {
   const dispatch = useDispatch();
-  const { data: policies, loading, filter } = useSelector((state: RootState) => state.admin.policies);
+  const {
+    data: policies,
+    loading,
+    filter,
+  } = useSelector((state: RootState) => state.admin.policies);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [policyToDelete, setPolicyToDelete] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');

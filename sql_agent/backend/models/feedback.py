@@ -87,7 +87,7 @@ class FeedbackResponseRead(FeedbackResponseBase):
     updated_at: datetime = Field(..., description="Response last update timestamp")
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FeedbackRead(FeedbackBase):
@@ -103,7 +103,7 @@ class FeedbackRead(FeedbackBase):
     responses: List[FeedbackResponseRead] = Field([], description="Responses to this feedback")
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FeedbackSummary(BaseModel):
@@ -117,7 +117,7 @@ class FeedbackSummary(BaseModel):
     response_count: int = Field(0, description="Number of responses")
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class FeedbackStatistics(BaseModel):

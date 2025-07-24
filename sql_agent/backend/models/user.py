@@ -36,6 +36,7 @@ class UserPreferences(BaseModel):
     results_per_page: int = Field(default=50, ge=10, le=1000)
 
     class Config:
+        from_attributes = True
         use_enum_values = True
 
 class DatabasePermission(BaseModel):
@@ -46,6 +47,7 @@ class DatabasePermission(BaseModel):
     allowed_tables: List[str] = []
 
     class Config:
+        from_attributes = True
         use_enum_values = True
 
 class UserPermissions(BaseModel):
@@ -64,7 +66,7 @@ class User(UserBase):
     permissions: UserPermissions
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         use_enum_values = True
 
 class UserResponse(UserBase):
@@ -78,7 +80,7 @@ class UserResponse(UserBase):
     permissions: UserPermissions
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         use_enum_values = True
 
 class UserUpdate(BaseModel):

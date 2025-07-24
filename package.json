@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@mui/x-date-pickers": "^8.9.0",
+    "date-fns": "^2.30.0"
+  }
+}

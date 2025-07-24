@@ -5,22 +5,15 @@ interface LoadingButtonProps extends ButtonProps {
   loading?: boolean;
 }
 
-const LoadingButton: React.FC<LoadingButtonProps> = ({ 
-  children, 
-  loading = false, 
-  disabled, 
-  ...props 
+const LoadingButton: React.FC<LoadingButtonProps> = ({
+  children,
+  loading = false,
+  disabled,
+  ...props
 }) => {
   return (
-    <Button
-      disabled={disabled || loading}
-      {...props}
-    >
-      {loading ? (
-        <CircularProgress size={24} color="inherit" />
-      ) : (
-        children
-      )}
+    <Button disabled={disabled || loading} {...props}>
+      {loading ? <CircularProgress size={24} color="inherit" /> : children}
     </Button>
   );
 };

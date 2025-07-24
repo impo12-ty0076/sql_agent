@@ -57,9 +57,8 @@ class Feedback(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
-    # Relationships
     user = relationship("User", back_populates="feedbacks")
-    query = relationship("Query", back_populates="feedbacks")
+    query = relationship("QueryDB", back_populates="feedbacks")
     responses = relationship("FeedbackResponse", back_populates="feedback", cascade="all, delete-orphan")
 
 
